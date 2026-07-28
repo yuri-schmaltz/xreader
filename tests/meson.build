@@ -26,5 +26,5 @@ test_file_helpers = executable(
 test(
     'test-file-helpers',
     test_file_helpers,
-    protocol: 'gtester',
+    protocol: 'gtest',
 )
