@@ -239,6 +239,7 @@ subdir('install-scripts')
 # no longer need to worry about building on 0.45 or earlier
 if meson.version().version_compare('>=0.46')
     subdir('test')
+    subdir('tests')
 endif
 
 xreader_headers = [
