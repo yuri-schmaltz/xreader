@@ -83,3 +83,14 @@ Clement Lefebvre             <clement.lefebvre@linuxmint.com>  mate-i18n        
 # 'web-flow'.  Skip them here -- they are noise from the point of
 # view of the real git shortlog, but the real identity is already
 # in the original (non-noreply) commit author.
+
+# --- Single-name contributors with multiple email addresses ---
+
+raveit65                        <mate@raveit.de>               raveit65                        <chat-to-me@raveit.de>
+Matthew Petroff                 <matthew@mpetroff.net>         Matthew Petroff                 <github@mpetroff.net>
+Michael Webster                 <miketwebster@gmail.com>       Michael Webster                 <262776+mtwebster@users.noreply.github.com>
+Leigh Scott                     <leigh123linux@googlemail.com> Leigh Scott                     <leigh123linux@gmail.com>
+Leigh Scott                     <leigh123linux@googlemail.com> Leigh Scott                     <leigh123linux@fedoraproject.org>
+Peter Moser                     <p.moser@noi.bz.it>            Peter Moser                     <pitiz29a@gmail.com>
+Peter Moser                     <p.moser@noi.bz.it>            Peter Moser                     <peter.moser@idm-suedtirol.com>
+Eli Schwartz                    <eschwartz@archlinux.org>      Eli Schwartz                    <eschwartz93@gmail.com>
