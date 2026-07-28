@@ -28,3 +28,25 @@ test(
     test_file_helpers,
     protocol: 'gtest',
 )
+
+test_mime = executable(
+    'test-mime',
+    'test-mime.c',
+    '../libdocument/ev-file-helpers.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+        zlib,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-mime"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-mime',
+    test_mime,
+    protocol: 'gtest',
+)
