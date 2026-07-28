@@ -241,6 +241,7 @@ subdir('install-scripts')
 if meson.version().version_compare('>=0.46')
     subdir('test')
     subdir('tests')
+    subdir('fuzz')
 endif
 
 xreader_headers = [
