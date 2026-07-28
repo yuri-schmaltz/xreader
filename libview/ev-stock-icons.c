@@ -1,4 +1,3 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /* Stock icons for Xreader
  *
  * Copyright (C) 2003 Martin Kretzschmar
@@ -32,22 +31,29 @@ typedef struct {
 	char *icon;
 } EvStockIcon;
 
-/* Xreader stock icons */
+/* Xreader stock icons.
+ *
+ * The "icon" column used to hold the full-color freedesktop icon names
+ * (e.g. "object-rotate-left").  Modern themes (XApp, Adwaita, Yaru, Papirus)
+ * ship only the symbolic variants, so the full-color names are no longer
+ * resolvable.  Switch to the matching xapp-symbolic-icons (xsi-*-symbolic)
+ * names so the legacy GtkIconFactory registration keeps working.
+ */
 static const EvStockIcon stock_icons [] = {
-	{ EV_STOCK_ZOOM,	     "zoom" },
-	{ EV_STOCK_ZOOM_PAGE,        "zoom-fit-height" },
-	{ EV_STOCK_ZOOM_WIDTH,       "zoom-fit-width" },
-	{ EV_STOCK_VIEW_DUAL,        "view-page-facing" },
-	{ EV_STOCK_VIEW_CONTINUOUS,  "view-page-continuous" },
-	{ EV_STOCK_ROTATE_LEFT,      "object-rotate-left"},
-	{ EV_STOCK_ROTATE_RIGHT,     "object-rotate-right"},
-	{ EV_STOCK_RUN_PRESENTATION, "x-office-presentation"},
-	{ EV_STOCK_VISIBLE,          "eye"},
-	{ EV_STOCK_RESIZE_SE,        "resize-se"},
-	{ EV_STOCK_RESIZE_SW,        "resize-sw"},
-	{ EV_STOCK_CLOSE,            "close"},
-	{ EV_STOCK_INVERTED_COLORS,  "stock_filters-invert"},
-	{ EV_STOCK_ATTACHMENT,       "mail-attachment"}
+	{ EV_STOCK_ZOOM,             "xsi-zoom-symbolic" },
+	{ EV_STOCK_ZOOM_PAGE,        "xsi-zoom-fit-height-symbolic" },
+	{ EV_STOCK_ZOOM_WIDTH,       "xsi-zoom-fit-width-symbolic" },
+	{ EV_STOCK_VIEW_DUAL,        "xsi-view-page-facing-symbolic" },
+	{ EV_STOCK_VIEW_CONTINUOUS,  "xsi-view-page-continuous-symbolic" },
+	{ EV_STOCK_ROTATE_LEFT,      "xsi-object-rotate-left-symbolic" },
+	{ EV_STOCK_ROTATE_RIGHT,     "xsi-object-rotate-right-symbolic" },
+	{ EV_STOCK_RUN_PRESENTATION, "xsi-x-office-presentation-symbolic" },
+	{ EV_STOCK_VISIBLE,          "xsi-eye-symbolic" },
+	{ EV_STOCK_RESIZE_SE,        "xsi-resize-se-symbolic" },
+	{ EV_STOCK_RESIZE_SW,        "xsi-resize-sw-symbolic" },
+	{ EV_STOCK_CLOSE,            "xsi-window-close-symbolic" },
+	{ EV_STOCK_INVERTED_COLORS,  "xsi-filters-invert-symbolic" },
+	{ EV_STOCK_ATTACHMENT,       "xsi-mail-attachment-symbolic" }
 };
 
 static gchar *ev_icons_path;
@@ -133,4 +139,3 @@ ev_stock_icons_shutdown (void)
 {
 	g_free (ev_icons_path);
 }
-
