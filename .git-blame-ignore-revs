@@ -1,0 +1,14 @@
+# .git-blame-ignore-revs
+#
+# Revisions listed here are hidden from `git blame` output by passing
+# `--ignore-revs-file .git-blame-ignore-revs`.  GitHub also reads this
+# file automatically (when the option is enabled in the repo settings).
+#
+# Use this for mass-formatting commits that are noise from the perspective
+# of a normal blame history (e.g. the GTK_STOCK_ -> xsi-icon migration,
+# the minizip -> libzip drop).  Add the most recent commit at the bottom,
+# keep the file in chronological order, so the diff against the previous
+# version of this file stays small.
+#
+# Example entry:
+#   0123456789abcdef0123456789abcdef01234567  Short description of the change
