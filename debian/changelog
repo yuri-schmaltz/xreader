@@ -1,3 +1,24 @@
+xreader (4.7.0) zena; urgency=medium
+
+  * 31 self-PRs landed in the yuri-schmaltz/xreader fork, covering:
+    - [SECURITY] 4 command-injection / buffer-overflow fixes
+      (PRs #1, #2, #10, #18)
+    - 5 GTK_STOCK_* deprecation cleanups (PRs #3-#7)
+    - 16 icon name modernizations to xsi-*-symbolic (PRs #14, #15)
+    - CI hardening: strict-warnings + ASan/UBSan + 60s libFuzzer smoke
+      (PRs #8, #19)
+    - New libFuzzer harness with seed corpus (PRs #13, #29)
+    - Unit test bootstrap (PRs #11, #25, #31)
+    - System libzip migration (PR #12, removes 3,067 lines of
+      embedded minizip)
+    - Developer tooling: .editorconfig, .clang-format, HACKING.md,
+      RELEASE.md, NEWS, SECURITY.md, .mailmap (PRs #16, #17, #20-#22)
+    - Various: ev_stock_icons xsi migration, gtk_dialog_get_action_area
+      cleanup, afmparse.c g_strdup, g_build_filename in epub
+      (PRs #15, #27, #28, #30)
+
+ -- Mavis <Mavis@local>  2026-07-28
+
 xreader (4.6.5) zena; urgency=medium
 
   * Depend on xapp-symbolic-icons

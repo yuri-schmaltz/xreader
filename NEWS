@@ -18,10 +18,12 @@ vulnerability; see SECURITY.md for the responsible-disclosure
 policy.
 
 
-Changes in development (unreleased)
------------------------------------
+Changes in 4.7.0 (2026-07-28)
+-----------------------
 
-This development cycle has no tagged release yet.  The
+This is the first release since 4.6.5. The 4.7.0 cycle
+included 31 self-PRs in the yuri-schmaltz/xreader fork; see
+`debian/changelog` for the canonical list.  The
 upcoming 4.7.0 release will include the following changes
 that were merged into the yuri-schmaltz/xreader fork and are
 queued for review in the upstream linuxmint/xreader repository
