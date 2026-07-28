@@ -1,0 +1,189 @@
+xreader NEWS -- user-visible change log
+========================================
+
+This file tracks user-visible changes.  Internal refactors
+(deprecation cleanups, test bootstraps, dev tooling, ...) that
+do not change a user-visible behaviour are not listed here;
+they are documented in the commit log and in the release
+notes generated from debian/changelog at packaging time.
+
+The format is loosely inspired by the GNU NEWS file convention:
+one section per released version, newest first.  Each section
+opens with a heading like "Changes in 4.7.0" and is followed
+by a "Highlights" summary and a bulleted list grouped by
+component.
+
+Entries marked with `[SECURITY]` describe a fix for a
+vulnerability; see SECURITY.md for the responsible-disclosure
+policy.
+
+
+Changes in development (unreleased)
+-----------------------------------
+
+This development cycle has no tagged release yet.  The
+upcoming 4.7.0 release will include the following changes
+that were merged into the yuri-schmaltz/xreader fork and are
+queued for review in the upstream linuxmint/xreader repository
+(track via the PR list in HACKING.md):
+
+Build, CI, packaging
+~~~~~~~~~~~~~~~~~~~~
+
+* `debian/control` -- bump `debhelper-compat` from 12 to 13
+  and `Standards-Version` from 3.9.6 to 4.6.2; drop the
+  `intltool` build dependency in favour of the meson-native
+  i18n module; drop the `lsb-release` runtime dependency.
+* `.github/workflows/ci-checks.yml` -- new CI workflow
+  separate from the distro build, with two jobs: a strict
+  `-Werror` build with `-Wall -Wextra -Wformat=2
+  -Wformat-security -Wnull-dereference -Wmissing-prototypes
+  -Wshadow -Wpointer-arith -Wcast-align -Wstrict-prototypes`,
+  and a separate build with `-fsanitize=address,undefined`
+  running the test suite under ASan + UBSan.  (PR #8)
+* `.github/workflows/ci-checks.yml` -- a third job, a
+  60-second libFuzzer smoke run driven by the new
+  `fuzz/fuzz-document-load.c` harness.  Crashing inputs are
+  uploaded as a `fuzz-crashes` artifact.  (PR #19)
+
+Backend, document parsing
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `backend/epub/` -- migrate the embedded 3,000-line minizip
+  fork to the system `libzip` (3,067 lines removed, the
+  build now depends on `libzip-dev` instead of compiling
+  the fork).  The `.epub` loader API is unchanged.  (PR #12)
+* `backend/dvi/mdvi-lib/afmparse.c` -- replace 17
+  `malloc(strlen(s)+1) + strcpy` patterns with `g_strdup`,
+  add the missing `<glib.h>` include.  (PR #21)
+
+Security
+~~~~~~~~
+
+* `[SECURITY]` `libview/ev-print-operation.c`,
+  `shell/main.c` -- replace `g_app_info_create_from_commandline`
+  with `g_spawn_async` taking an explicit `argv[]` array, so
+  that user-controlled arguments from the document (print
+  settings, file path) are passed to the child verbatim
+  instead of being re-parsed through a shell-style splitter.
+  Fixes the third-party report classified as the same
+  injection class as the print previewer.  (PR #1)
+* `[SECURITY]` `backend/dvi/dvi-document.c` -- replace
+  `g_spawn_command_line_sync` (which routes through `/bin/sh
+  -c`) with `g_spawn_sync` taking an explicit `argv[]` for
+  the `dvipdfm` invocation, so page indices, the
+  `exporter_filename`, and the `context->filename` cannot
+  inject extra arguments via shell metacharacters.  (PR #2)
+* `[SECURITY]` `shell/ev-application.c` `ev_spawn()` --
+  same fix as PR #1, but for the `ev_spawn` helper that
+  re-launches xreader when the user clicks a link to a
+  different document.  The `page-label`, `named-dest`, and
+  `--find` arguments can be set by the document, so they
+  were all sourced through `g_app_info_create_from_commandline`;
+  the new code passes them as a pre-built `argv[]` array.
+  (PR #18)
+* `[SECURITY]` `backend/dvi/mdvi-lib/paper.c` -- replace
+  four `sprintf` calls with `g_snprintf` to bound the write
+  to the buffer.  The original code could write up to ~256
+  bytes into a stack-allocated 80-byte buffer; the fix
+  limits each call to the buffer size and checks the return
+  value.  (PR #10)
+
+Modernization
+~~~~~~~~~~~~~
+
+* Remove every reference to the deprecated `GTK_STOCK_*`
+  macro across `previewer/`, `shell/`, and `libview/`, and
+  replace each one with either a localized plain-text label
+  (for the cases where the GTK_STOCK_* was used for its
+  accelerator underline) or a themed `xsi-*-symbolic` icon
+  name (for the cases where the GTK_STOCK_* was used for
+  its icon).  The XSI icon names render correctly on HiDPI
+  displays and on the modern XApp / Adwaita / Yaru / Papirus
+  themes, which no longer ship the legacy full-color names.
+  (PRs #3 - #7)
+* `libview/ev-stock-icons.c` -- switch the 14 entries in
+  the legacy `gtk_icon_factory` registration to their
+  matching `xsi-*-symbolic` names, so the `EV_STOCK_*`
+  stock ids resolve to modern icons.  (PR #15)
+* `shell/ev-window.c`, `previewer/ev-previewer-window.c` --
+  switch the `PageSelector` toolbar action's hard-coded
+  `text-x-generic` icon to `xsi-text-x-generic-symbolic`.
+  (PR #14)
+
+Testing, infrastructure
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `tests/test-file-helpers.c` -- new GLib Testing unit
+  tests for the public helpers in `libdocument/ev-file-helpers.h`:
+  `ev_mkstemp`, `ev_mkdtemp`, and the zlib compress /
+  decompress pair.  Run via `meson test -C build
+  test-file-helpers`.  (PR #11)
+* `tests/` -- additional unit tests for `ev_mkstemp_file`,
+  `ev_file_compress`, `ev_file_uncompress`,
+  `ev_xfer_uri_simple`, and `ev_file_get_mime_type`.  Run
+  via the same `meson test` driver.  (PR #22)
+* `fuzz/fuzz-document-load.c` -- new libFuzzer harness for
+  `ev_document_factory_get_document`, covering all 8
+  document backends (poppler / djvu / dvi / pixbuf / comics
+  / xps / epub / tiff) via the file content sniffer.  Build
+  via `-Dfuzz=true` (clang only); the CI fuzz job runs the
+  harness for 60 seconds on every PR.  (PR #13)
+* `fuzz/corpus/` -- seed corpus for the harness, with
+  small samples of each supported document format.
+  (PR #23)
+
+Developer experience
+~~~~~~~~~~~~~~~~~~~~
+
+* `.editorconfig` -- canonicalize tabs for `*.c` and `*.h`,
+  4-space indent elsewhere, UTF-8 + LF, trim trailing
+  whitespace except in `.po` catalogs and `.md` prose.
+  (PR #16)
+* `.gitattributes` -- pin text/binary attributes per file
+  extension, set the LF-only line ending rule, register
+  diff drivers for `.po`, `.json`, and `.xml`.  (PR #16)
+* `.git-blame-ignore-revs` -- empty placeholder file ready
+  to be populated with mass-formatting commit SHAs.  (PR #16)
+* `SECURITY.md` -- responsible-disclosure policy pointing
+  at `security@linuxmint.com`, list of supported versions,
+  reminder that public GitHub issues should NOT be used for
+  security reports.  (PR #16)
+* `.clang-format` -- canonical C source formatter config
+  (8-column tabs, GNU control-flow braces, pointers on the
+  type, do-not-sort-includes to preserve the existing
+  include-block conventions).  (PR #17)
+* `HACKING.md` -- developer guide covering build
+  prerequisites, the meson build types, the three test
+  families, the coding style, and the pull-request flow.
+  (PR #17)
+* `tools/check-source.sh` -- one-shot source-quality script
+  that flags trailing whitespace, accidental tabs in
+  non-source files, CRLF line endings, and UTF-8 BOMs, and
+  optionally runs `clang-format --dry-run` and `shellcheck`
+  on `tools/`.  Intended to be hooked up to a pre-commit
+  hook.  (PR #17)
+* `tools/lint-commits.sh` -- verify each new commit message
+  in `git log origin/master..HEAD` starts with a
+  `component: ` prefix and stays under 80 characters per
+  line.  (PR #24)
+* `RELEASE.md` -- release process: bump version, regenerate
+  `debian/changelog`, tag, push, build the deb.  (PR #25)
+* `.mailmap` -- canonicalize the 96 distinct author/email
+  pairs in the git history down to 78, merging
+  `Moser Peter` / `Peter Moser`, `infirit` / `Sander Sweers`,
+  `Monsta` / `monsta`, `icarter09` / `Isaac Carter`,
+  `raveit65` / `raveit`, `Musa Unal` / `Musa Ünal` /
+  `musa` / `m8`, etc.  (PR #20)
+
+Deprecations
+~~~~~~~~~~~~
+
+* `shell/ev-password-view.c`,
+  `shell/ev-properties-dialog.c` -- remove the deprecated
+  `gtk_dialog_get_action_area` calls (deprecated since GTK
+  3.12, removed in GTK 4).  The two dialogs already use
+  `gtk_dialog_add_button` for the OK / Cancel buttons, so
+  the action area was just being read for its border-width
+  and box-spacing properties, which we now apply to the
+  content area instead.  (PR #26)
