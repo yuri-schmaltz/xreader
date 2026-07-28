@@ -1,0 +1,125 @@
+name: CI checks
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  # Build with strict warning flags.  Catches the kinds of regressions
+  # that the distro-packaged build workflow does not.
+  warnings:
+    name: Strict warnings
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential \
+            meson \
+            pkg-config \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libsm-dev \
+            libice-dev \
+            libx11-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            xapp-symbolic-icons \
+            shared-mime-info \
+            gettext \
+            intltool \
+            libxreaderdocument-dev \
+            libxreaderview-dev \
+            desktop-file-utils \
+            xvfb \
+            ca-certificates
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure (strict warnings)
+        run: |
+          meson setup build \
+            --buildtype=debug \
+            --werror \
+            --warnlevel=2 \
+            -Dc_args="-Wall -Wextra -Wformat=2 -Wformat-security -Wnull-dereference -Wmissing-prototypes -Wmissing-declarations -Wshadow -Wpointer-arith -Wcast-align -Wstrict-prototypes -Wno-unused-parameter"
+      - name: Build
+        run: ninja -C build
+      - name: Test
+        run: xvfb-run -a meson test -C build --print-errorlogs
+
+  # Build with AddressSanitizer + UndefinedBehaviorSanitizer.  Catches
+  # the kinds of memory safety / UB bugs that the libepub null-pointer
+  # fix (commit a79398c) and the sizeof-of-array fix (commit 1cde192)
+  # were found by, manually.  This automates the check.
+  sanitizers:
+    name: ASan + UBSan
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential \
+            meson \
+            pkg-config \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libsm-dev \
+            libice-dev \
+            libx11-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            xapp-symbolic-icons \
+            shared-mime-info \
+            gettext \
+            intltool \
+            libxreaderdocument-dev \
+            libxreaderview-dev \
+            desktop-file-utils \
+            xvfb \
+            ca-certificates
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure (sanitizers)
+        run: |
+          CC=clang CXX=clang++ meson setup build-san \
+            --buildtype=debug \
+            -Db_sanitize=address,undefined \
+            -Db_lto=false \
+            -Dcpp_args="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -Dc_args="-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g"
+      - name: Build
+        run: ninja -C build-san
+      - name: Test
+        run: xvfb-run -a meson test -C build-san --print-errorlogs
+        env:
+          ASAN_OPTIONS: "detect_leaks=1:abort_on_error=1:print_stacktrace=1"
+          UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
