@@ -1,0 +1,55 @@
+# .gitattributes -- per-path git attributes
+#
+# 1. Line ending normalization:
+#    Every text file in the tree is LF in the repo (see .editorconfig) and
+#    we want Git to keep it that way on Windows checkouts too, so disable
+#    autocrlf for the whole tree.  The exception is .bat / .cmd / .ps1 files
+#    where CRLF is mandatory for the Windows interpreter.
+#
+# 2. Diff hunk splitting:
+#    For the languages that have a real lexer, use the standard GitLab/GitHub
+#    diffing driver so the rendered diff is sane (e.g. .po lines are not
+#    mangled by the C lexer, .json is not treated as a single line).
+#
+# 3. .git-blame-ignore-revs:
+#    Big reformatting commits (e.g. the GTK_STOCK -> xsi-icon mass rename
+#    from PR #3-#7, the minizip -> libzip drop from PR #12) should not
+#    dominate git blame output.  Reference such revisions here, separated
+#    by line, in newest-last order.
+
+# 1. Line endings
+*                 text eol=lf
+*.bat             text eol=crlf
+*.cmd             text eol=crlf
+*.ps1             text eol=crlf
+*.png             binary
+*.jpg             binary
+*.jpeg            binary
+*.gif             binary
+*.ico             binary
+*.svg             binary
+*.pdf             binary
+*.gz              binary
+*.bz2             binary
+*.xz              binary
+*.zip             binary
+*.7z              binary
+*.mo              binary
+*.po              text
+*.gmo             binary
+*.so              binary
+*.la              binary
+*.a               binary
+*.o               binary
+
+# 2. Diff drivers
+*.po              diff=po
+*.json            diff=json
+*.xml             diff=xml
+*.ui              diff=xml
+
+# 3. Blame-ignore refs (keep newest at the bottom)
+#    Use `git blame --ignore-revs-file .git-blame-ignore-revs` to follow
+#    history past these commits; GitHub also honors the file
+#    `.git-blame-ignore-revs` at the repo root (see the next file).
+.git-blame-ignore-revs  export-subst

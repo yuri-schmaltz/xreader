@@ -1,0 +1,52 @@
+# EditorConfig is awesome: https://EditorConfig.org
+#
+# One file to drive the indent / line-ending / charset rules for every
+# editor the contributors happen to use (GNOME Builder, Qt Creator,
+# vim, emacs, VS Code, Sublime, IntelliJ, ...).
+#
+# This file is a 1:1 mirror of the actual code in the tree as of 4.6.5:
+#   - C/H/PO/POT files use TABS (8-wide visual tabs, kept as the historical
+#     GNU convention from when the project forked from Evince 3.x);
+#   - everything else uses 4-space soft indent;
+#   - UTF-8 no BOM, LF line endings, trim trailing whitespace.
+#
+# Per-file overrides stay at the bottom for the exceptions we do have
+# (e.g. .po files must keep the GNU gettext "obsolete entry" trailing
+# whitespace, and the .gitignore uses a different comment style).
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{c,h}]
+indent_style = tab
+indent_size = 8
+tab_width = 8
+
+[*.{po,pot}]
+indent_size = 0
+# gettext catalogs intentionally have trailing whitespace on msgstr lines
+# (e.g. "msgstr \"foo  \n\""), so do not trim there.
+trim_trailing_whitespace = false
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+indent_size = 8
+tab_width = 8
+
+[*.{xml,ui}]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
