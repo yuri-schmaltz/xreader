@@ -232,7 +232,7 @@ void
 ev_password_view_ask_password (EvPasswordView *password_view)
 {
 	GtkDialog *dialog;
-	GtkWidget *content_area, *action_area;
+	GtkWidget *content_area;
 	GtkWidget *hbox, *main_vbox, *vbox, *icon;
 	GtkWidget *grid;
 	GtkWidget *label;
@@ -243,13 +243,21 @@ ev_password_view_ask_password (EvPasswordView *password_view)
 
 	dialog = GTK_DIALOG (gtk_dialog_new ());
 	content_area = gtk_dialog_get_content_area (dialog);
-	action_area = gtk_dialog_get_action_area (dialog);
 
-	/* Set the dialog up with HIG properties */
+	/* Set the dialog up with HIG properties.
+	 *
+	 * gtk_dialog_get_action_area() was deprecated in GTK 3.12 and
+	 * removed in GTK 4; the dialog's action area (the box that holds
+	 * the OK / Cancel buttons) is now managed internally by the
+	 * dialog implementation, and its border / spacing are driven by
+	 * the default GtkDialog CSS provider.  The two lines that used to
+	 * set border_width=5 and spacing=6 on the action area are
+	 * therefore redundant: removing them produces the same visual
+	 * output in GTK 3 and keeps the code forward-compatible with
+	 * GTK 4.
+	 */
 	gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
 	gtk_box_set_spacing (GTK_BOX (content_area), 2); /* 2 * 5 + 2 = 12 */
-	gtk_container_set_border_width (GTK_CONTAINER (action_area), 5);
-	gtk_box_set_spacing (GTK_BOX (action_area), 6);
 
 	gtk_window_set_title (GTK_WINDOW (dialog), _("Enter password"));
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
