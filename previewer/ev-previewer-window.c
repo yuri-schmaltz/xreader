@@ -275,7 +275,13 @@ ev_previewer_window_print (GtkAction         *action,
 }
 
 static const GtkActionEntry action_entries[] = {
-	{ "FileCloseWindow", GTK_STOCK_CLOSE, NULL, "<control>W",
+	/* The deprecated Gtk stock-item icon API (removed in GTK 3.10) is
+	 * no longer available; the icon-name string is passed through
+	 * GtkIconTheme, so use the matching themed name from
+	 * xapp-symbolic-icons (the project already depends on it since 4.6.4)
+	 * for visual parity with the other action entries below.
+	 */
+	{ "FileCloseWindow", "xsi-window-close-symbolic", NULL, "<control>W",
 	  NULL,
 	  G_CALLBACK (ev_previewer_window_close) },
 	{ "GoPreviousPage", "xsi-go-previous-symbolic", N_("_Previous Page"), "<control>Page_Up",
@@ -312,25 +318,31 @@ static const GtkActionEntry accel_entries[] = {
 	  G_CALLBACK (ev_previewer_window_scroll_forward) },
 	{ "ShiftReturn", NULL, "", "<shift>Return", NULL,
 	  G_CALLBACK (ev_previewer_window_scroll_backward) },
-	{ "p", GTK_STOCK_GO_UP, "", "p", NULL,
+	/* The accel_entries table is used by gtk_action_group_add_actions()
+	 * only to bind accelerators; the stock_id field is never rendered in
+	 * any menu or toolbar (the labels are empty and these entries are
+	 * not inserted into the UI manager).  NULL is the right value --
+	 * the now-removed stock-item API is what stock_id used to consume.
+	 */
+	{ "p", NULL, "", "p", NULL,
 	  G_CALLBACK (ev_previewer_window_previous_page) },
-	{ "n", GTK_STOCK_GO_DOWN, "", "n", NULL,
+	{ "n", NULL, "", "n", NULL,
 	  G_CALLBACK (ev_previewer_window_next_page) },
-	{ "Plus", GTK_STOCK_ZOOM_IN, NULL, "plus", NULL,
+	{ "Plus", NULL, NULL, "plus", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_in) },
-	{ "CtrlEqual", GTK_STOCK_ZOOM_IN, NULL, "<control>equal", NULL,
+	{ "CtrlEqual", NULL, NULL, "<control>equal", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_in) },
-	{ "Equal", GTK_STOCK_ZOOM_IN, NULL, "equal", NULL,
+	{ "Equal", NULL, NULL, "equal", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_in) },
-	{ "Minus", GTK_STOCK_ZOOM_OUT, NULL, "minus", NULL,
+	{ "Minus", NULL, NULL, "minus", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_out) },
-	{ "KpPlus", GTK_STOCK_ZOOM_IN, NULL, "KP_Add", NULL,
+	{ "KpPlus", NULL, NULL, "KP_Add", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_in) },
-	{ "KpMinus", GTK_STOCK_ZOOM_OUT, NULL, "KP_Subtract", NULL,
+	{ "KpMinus", NULL, NULL, "KP_Subtract", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_out) },
-	{ "CtrlKpPlus", GTK_STOCK_ZOOM_IN, NULL, "<control>KP_Add", NULL,
+	{ "CtrlKpPlus", NULL, NULL, "<control>KP_Add", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_in) },
-	{ "CtrlKpMinus", GTK_STOCK_ZOOM_OUT, NULL, "<control>KP_Subtract", NULL,
+	{ "CtrlKpMinus", NULL, NULL, "<control>KP_Subtract", NULL,
 	  G_CALLBACK (ev_previewer_window_zoom_out) },
 	{ "FocusPageSelector", NULL, "", "<control>l", NULL,
 	  G_CALLBACK (ev_previewer_window_focus_page_selector) }
