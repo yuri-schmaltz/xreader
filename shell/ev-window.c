@@ -6605,7 +6605,7 @@ register_custom_actions (EvWindow       *window,
             "name", PAGE_SELECTOR_ACTION,
             "label", _("Page"),
             "tooltip", _("Select Page"),
-            "icon_name", "text-x-generic",
+            "icon_name", "xsi-text-x-generic-symbolic",
             "visible_overflown", FALSE,
             NULL);
     ev_page_action_set_model (EV_PAGE_ACTION (action),
