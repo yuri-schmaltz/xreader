@@ -97,16 +97,16 @@ int	mdvi_get_paper_size(const char *name, DviPaper *paper)
 
 	paper->pclass = MDVI_PAPER_CLASS_CUSTOM;
 	if(sscanf(name, "%lfx%lf%c%c", &a, &b, &c, &d) == 4) {
-		sprintf(buf, "%12.16f%c%c", a, c, d);
+		g_snprintf(buf, sizeof(buf), "%12.16f%c%c", a, c, d);
 		paper->inches_wide = unit2pix_factor(buf);
-		sprintf(buf, "%12.16f%c%c", b, c, d);
+		g_snprintf(buf, sizeof(buf), "%12.16f%c%c", b, c, d);
 		paper->inches_tall = unit2pix_factor(buf);
 		paper->name = _("custom");
 		return 0;
 	} else if(sscanf(name, "%lf%c%c,%lf%c%c", &a, &c, &d, &b, &e, &f) == 6) {
-		sprintf(buf, "%12.16f%c%c", a, c, d);
+		g_snprintf(buf, sizeof(buf), "%12.16f%c%c", a, c, d);
 		paper->inches_wide = unit2pix_factor(buf);
-		sprintf(buf, "%12.16f%c%c", b, e, f);
+		g_snprintf(buf, sizeof(buf), "%12.16f%c%c", b, e, f);
 		paper->inches_tall = unit2pix_factor(buf);
 		paper->name = _("custom");
 		return 0;
