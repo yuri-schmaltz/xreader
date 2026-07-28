@@ -12,11 +12,20 @@ on:
 jobs:
   # Build with strict warning flags.  Catches the kinds of regressions
   # that the distro-packaged build workflow does not.
+  #
+  # Run on a matrix of Ubuntu LTS versions to catch the case where
+  # a PR compiles cleanly on 24.04 but breaks on 22.04 (e.g. due
+  # to a deprecated glib API still present in 22.04's libraries,
+  # or a missing -Wno-foo flag in the 24.04 default compiler).
   warnings:
-    name: Strict warnings
+    name: Strict warnings (${{ matrix.distro }})
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [ubuntu-22.04, ubuntu-24.04]
     container:
-      image: ubuntu:24.04
+      image: ubuntu:${{ matrix.distro == 'ubuntu-22.04' && '22.04' || '24.04' }}
     steps:
       - name: Install dependencies
         run: |
@@ -69,10 +78,14 @@ jobs:
   # fix (commit a79398c) and the sizeof-of-array fix (commit 1cde192)
   # were found by, manually.  This automates the check.
   sanitizers:
-    name: ASan + UBSan
+    name: ASan + UBSan (${{ matrix.distro }})
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [ubuntu-22.04, ubuntu-24.04]
     container:
-      image: ubuntu:24.04
+      image: ubuntu:${{ matrix.distro == 'ubuntu-22.04' && '22.04' || '24.04' }}
     steps:
       - name: Install dependencies
         run: |
