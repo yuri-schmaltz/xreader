@@ -221,34 +221,50 @@ ev_spawn (const char     *uri,
           const gchar    *search_string,
           guint           timestamp)
 {
-    GString *cmd;
-    gchar *path, *cmdline;
-    GAppInfo *app;
-    GdkAppLaunchContext *ctx;
-    GError  *error = NULL;
+    /* The same fix as commit 50052ea / PR #1:  build argv[]
+     * directly instead of routing through a command-line string
+     * and g_app_info_create_from_commandline().  The arguments
+     * below come from the document (page labels and named
+     * destinations in PDF / DVI outlines, search strings
+     * forwarded from a "find" link) so they are user-influenced
+     * even if a separate process: a page label of
+     * "' ; rm -rf ~ ; echo '" would previously have been
+     * "shell-quoted" and passed through g_shell_quote()'s
+     * converter, but g_app_info_create_from_commandline() re-runs
+     * a parser on the result, and any mismatch between the
+     * quoter and the parser is a path-injection bug.  Build the
+     * array, spawn it, no shell.
+     */
+    gchar      **argv;
+    gchar       *path;
+    gint         argc = 0;
+    GError      *error = NULL;
+    gchar       *page_arg = NULL;
+    gchar       *find_arg = NULL;
+    const gchar *mode_arg = NULL;
+    gchar       *display_name = NULL;
+    gchar      **child_env = NULL;
+    GdkDisplay  *display;
 
-    cmd = g_string_new (NULL);
     path = g_build_filename (BINDIR, "xreader", NULL);
-    g_string_append_printf (cmd, " %s", path);
-    g_free (path);
 
     /* Page label or index */
     if (dest) {
         switch (ev_link_dest_get_dest_type (dest)) {
             case EV_LINK_DEST_TYPE_PAGE_LABEL: {
-                gchar *quoted = g_shell_quote (ev_link_dest_get_page_label (dest));
-                g_string_append_printf (cmd, " --page-label=%s", quoted);
-                g_free (quoted);
+                const gchar *label = ev_link_dest_get_page_label (dest);
+                if (label && *label)
+                    page_arg = g_strconcat ("--page-label=", label, NULL);
                 break;
             }
             case EV_LINK_DEST_TYPE_PAGE:
-                g_string_append_printf (cmd, " --page-index=%d",
-                                        ev_link_dest_get_page (dest) + 1);
+                page_arg = g_strdup_printf ("--page-index=%d",
+                                            ev_link_dest_get_page (dest) + 1);
                 break;
             case EV_LINK_DEST_TYPE_NAMED: {
-                gchar *quoted = g_shell_quote (ev_link_dest_get_named_dest (dest));
-                g_string_append_printf (cmd, " --named-dest=%s", quoted);
-                g_free (quoted);
+                const gchar *named = ev_link_dest_get_named_dest (dest);
+                if (named && *named)
+                    page_arg = g_strconcat ("--named-dest=", named, NULL);
                 break;
             }
             default:
@@ -257,53 +273,70 @@ ev_spawn (const char     *uri,
     }
 
     /* Find string */
-    if (search_string) {
-        gchar *quoted = g_shell_quote (search_string);
-        g_string_append_printf (cmd, " --find=%s", quoted);
-        g_free (quoted);
+    if (search_string && *search_string) {
+        find_arg = g_strconcat ("--find=", search_string, NULL);
     }
 
     /* Mode */
     switch (mode) {
         case EV_WINDOW_MODE_FULLSCREEN:
-            g_string_append (cmd, " -f");
+            mode_arg = "-f";
             break;
         case EV_WINDOW_MODE_PRESENTATION:
-            g_string_append (cmd, " -s");
+            mode_arg = "-s";
             break;
         default:
             break;
     }
 
-    cmdline = g_string_free (cmd, FALSE);
-    app = g_app_info_create_from_commandline (cmdline, NULL, G_APP_INFO_CREATE_SUPPORTS_URIS, &error);
+    /* argv[] = { path, page_arg?, find_arg?, mode_arg?, uri?, NULL }.
+     * Worst case: 1 (path) + 1 (page) + 1 (find) + 1 (mode) + 1 (uri) + 1 (NULL) = 6. */
+    argv = g_new0 (gchar *, 6);
+    argv[argc++] = path;
+    if (page_arg)  argv[argc++] = page_arg;
+    if (find_arg)  argv[argc++] = find_arg;
+    if (mode_arg)  argv[argc++] = (gchar *) mode_arg;
+    if (uri)       argv[argc++] = (gchar *) uri;
+    argv[argc] = NULL;
 
-    if (app != NULL) {
-        GList uri_list;
-        GList *uris = NULL;
-
-        ctx = gdk_display_get_app_launch_context (gdk_screen_get_display (screen));
-        gdk_app_launch_context_set_screen (ctx, screen);
-        gdk_app_launch_context_set_timestamp (ctx, timestamp);
-
-        if (uri) {
-            uri_list.data = (gchar *)uri;
-            uri_list.prev = uri_list.next = NULL;
-            uris = &uri_list;
+    /* The original code passed `screen` and `timestamp` through
+     * gdk_app_launch_context.  The child picks its display from
+     * $DISPLAY, so we override that env var when the caller asked
+     * for a non-default screen; the timestamp goes through the
+     * DESKTOP_STARTUP_ID env var which is what the freedesktop
+     * startup-notification spec also uses.
+     */
+    if (screen) {
+        display = gdk_screen_get_display (screen);
+        if (display)
+            display_name = gdk_display_get_name (display);
+    }
+    if (display_name) {
+        child_env = g_new0 (gchar *, 3);
+        child_env[0] = g_strdup_printf ("DISPLAY=%s", display_name);
+    }
+    if (timestamp != 0 && timestamp != GDK_CURRENT_TIME) {
+        gchar *startup_id = g_strdup_printf ("XREADER_STARTUP_ID=%u", timestamp);
+        if (!child_env) {
+            child_env = g_new0 (gchar *, 2);
+            child_env[0] = startup_id;
+        } else {
+            child_env[1] = startup_id;
         }
-        g_app_info_launch_uris (app, uris, G_APP_LAUNCH_CONTEXT (ctx), &error);
-
-        g_object_unref (app);
-        g_object_unref (ctx);
     }
 
-    if (error != NULL) {
-		g_printerr ("Error launching xreader %s: %s\n", uri, error->message);
+    if (!g_spawn_async (NULL, argv, child_env,
+                        G_SPAWN_SEARCH_PATH,
+                        NULL, NULL, NULL, &error)) {
+        g_printerr ("Error launching xreader %s: %s\n",
+                    uri ? uri : "", error->message);
         g_error_free (error);
     }
 
-    g_free (cmdline);
+    g_strfreev (argv);
+    g_strfreev (child_env);
 }
+
 
 static EvWindow *
 ev_application_get_empty_window (EvApplication *application,
