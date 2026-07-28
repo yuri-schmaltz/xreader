@@ -257,7 +257,7 @@ ev_password_view_ask_password (EvPasswordView *password_view)
 	gtk_window_set_transient_for (GTK_WINDOW (dialog), password_view->priv->parent_window);
 	gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
 
-	gtk_dialog_add_button (dialog, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+	gtk_dialog_add_button (dialog, _("_Cancel"), GTK_RESPONSE_CANCEL);
 	button = gtk_dialog_add_button (dialog, _("_Unlock Document"), GTK_RESPONSE_OK);
 
 	gtk_style_context_add_class (gtk_widget_get_style_context (button), GTK_STYLE_CLASS_SUGGESTED_ACTION);
