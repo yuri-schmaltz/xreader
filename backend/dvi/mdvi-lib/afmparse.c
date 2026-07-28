@@ -57,9 +57,14 @@
  */
 
 #include <config.h>
-#include "sysdeps.h"
 
 #ifdef WITH_AFM_FILES
+
+#if defined(HAVE_GLIB_H)
+#include <glib.h>
+#endif
+
+#include "sysdeps.h"
 
 #include <stdlib.h> /* added for MDVI */
 #include <string.h> /* added for MDVI */
@@ -295,37 +300,30 @@ static BOOL parseGlobals(FILE *fp, GlobalFontInfo *gfi)
             {
                 case STARTFONTMETRICS:
                     keyword = token(fp);
-                    gfi->afmVersion = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->afmVersion, keyword);
+                    gfi->afmVersion = g_strdup (keyword);
                     break;
                 case COMMENT:
                     keyword = linetoken(fp);
                     break;
                 case FONTNAME:
                     keyword = token(fp);
-                    gfi->fontName = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->fontName, keyword);
+                    gfi->fontName = g_strdup (keyword);
                     break;
                 case ENCODINGSCHEME:
                     keyword = token(fp);
-                    gfi->encodingScheme = (char *) 
-                    	malloc(strlen(keyword) + 1);
-                    strcpy(gfi->encodingScheme, keyword);
+                    gfi->encodingScheme = g_strdup (keyword);
                     break; 
                 case FULLNAME:
                     keyword = linetoken(fp);
-                    gfi->fullName = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->fullName, keyword);
+                    gfi->fullName = g_strdup (keyword);
                     break; 
                 case FAMILYNAME:           
                    keyword = linetoken(fp);
-                    gfi->familyName = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->familyName, keyword);
+                    gfi->familyName = g_strdup (keyword);
                     break; 
                 case WEIGHT:
                     keyword = token(fp);
-                    gfi->weight = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->weight, keyword);
+                    gfi->weight = g_strdup (keyword);
                     break;
                 case ITALICANGLE:
                     keyword = token(fp);
@@ -349,13 +347,11 @@ static BOOL parseGlobals(FILE *fp, GlobalFontInfo *gfi)
                     break;
                 case VERSION:
                     keyword = token(fp);
-                    gfi->version = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->version, keyword);
+                    gfi->version = g_strdup (keyword);
                     break; 
                 case NOTICE:
                     keyword = linetoken(fp);
-                    gfi->notice = (char *) malloc(strlen(keyword) + 1);
-                    strcpy(gfi->notice, keyword);
+                    gfi->notice = g_strdup (keyword);
                     break; 
                 case FONTBBOX:
                     keyword = token(fp);
@@ -645,8 +641,7 @@ static int parseCharMetrics(FILE *fp, FontInfo *fi)
                 break;
             case CHARNAME: 
                 keyword = token(fp);
-                temp->name = (char *) malloc(strlen(keyword) + 1);
-                strcpy(temp->name, keyword);
+                temp->name = g_strdup (keyword);
                 break;            
             case CHARBBOX: 
                 temp->charBBox.llx = atoi(token(fp));
@@ -667,11 +662,9 @@ static int parseCharMetrics(FILE *fp, FontInfo *fi)
                 
                 *tail = (Ligature *) calloc(1, sizeof(Ligature));
                 keyword = token(fp);
-                (*tail)->succ = (char *) malloc(strlen(keyword) + 1);
-                strcpy((*tail)->succ, keyword);
+                (*tail)->succ = g_strdup (keyword);
                 keyword = token(fp);
-                (*tail)->lig = (char *) malloc(strlen(keyword) + 1);
-                strcpy((*tail)->lig, keyword);
+                (*tail)->lig = g_strdup (keyword);
                 break; }
             case ENDCHARMETRICS:
                 cont = FALSE;;
@@ -856,13 +849,9 @@ static int parsePairKernData(FILE *fp, FontInfo *fi)
                     if (pcount < fi->numOfPairs)
                     {
                         keyword = token(fp);
-                        fi->pkd[pos].name1 = (char *) 
-                            malloc(strlen(keyword) + 1);
-                        strcpy(fi->pkd[pos].name1, keyword);
+                        fi->pkd[pos].name1 = g_strdup (keyword);
                         keyword = token(fp);
-                        fi->pkd[pos].name2 = (char *) 
-                            malloc(strlen(keyword) + 1);
-                        strcpy(fi->pkd[pos].name2, keyword);
+                        fi->pkd[pos].name2 = g_strdup (keyword);
                         keyword = token(fp);
                         fi->pkd[pos].xamt = atoi(keyword);
                         keyword = token(fp);
@@ -879,13 +868,9 @@ static int parsePairKernData(FILE *fp, FontInfo *fi)
                     if (pcount < fi->numOfPairs)
                     {
                         keyword = token(fp);
-                        fi->pkd[pos].name1 = (char *) 
-                            malloc(strlen(keyword) + 1);
-                        strcpy(fi->pkd[pos].name1, keyword);
+                        fi->pkd[pos].name1 = g_strdup (keyword);
                         keyword = token(fp);
-                        fi->pkd[pos].name2 = (char *) 
-                            malloc(strlen(keyword) + 1);
-                        strcpy(fi->pkd[pos].name2, keyword);
+                        fi->pkd[pos].name2 = g_strdup (keyword);
                         keyword = token(fp);
                         fi->pkd[pos++].xamt = atoi(keyword);
                         pcount++;
@@ -990,9 +975,7 @@ static int parseCompCharData(FILE *fp, FontInfo *fi)
                         pcount = 0;
                         if (firstTime) firstTime = FALSE;
                         else pos++;
-                        fi->ccd[pos].ccName = (char *) 
-                            malloc(strlen(keyword) + 1);
-                        strcpy(fi->ccd[pos].ccName, keyword);
+                        fi->ccd[pos].ccName = g_strdup (keyword);
                         keyword = token(fp);
                         fi->ccd[pos].numOfPieces = atoi(keyword);
                         fi->ccd[pos].pieces = (Pcc *)
@@ -1010,9 +993,7 @@ static int parseCompCharData(FILE *fp, FontInfo *fi)
                     if (pcount < fi->ccd[pos].numOfPieces)
                     {
                         keyword = token(fp);
-                        fi->ccd[pos].pieces[j].pccName = (char *) 
-                                malloc(strlen(keyword) + 1);
-                        strcpy(fi->ccd[pos].pieces[j].pccName, keyword);
+                        fi->ccd[pos].pieces[j].pccName = g_strdup (keyword);
                         keyword = token(fp);
                         fi->ccd[pos].pieces[j].deltax = atoi(keyword);
                         keyword = token(fp);
