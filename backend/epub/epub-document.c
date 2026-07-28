@@ -1221,7 +1221,7 @@ get_child_list(xmlNodePtr ol,gchar* documentdir)
             if ( !xmlStrcmp(children->name,(xmlChar*)"a")) {
                 newlinknode->linktext = (gchar*)xml_get_data_from_node(children,XML_KEYWORD,NULL);
                 gchar* filename = (gchar*)xml_get_data_from_node(children,XML_ATTRIBUTE,(xmlChar*)"href");
-				gchar *filepath = g_strdup_printf("%s/%s",documentdir,filename);
+				gchar *filepath = g_build_filename (documentdir, filename, NULL);
 				newlinknode->pagelink = g_filename_to_uri(filepath,NULL,NULL);
 				g_free(filename);
 				g_free(filepath);
@@ -1613,7 +1613,7 @@ epub_document_check_add_night_sheet(EvDocument *document)
                         font-style:italic;\
                         font-weight:bold;}";
 
-        gchar *csspath = g_strdup_printf("%s/xreadernightstyle.css",epub_document->documentdir);
+        gchar *csspath = g_build_filename (epub_document->documentdir, "xreadernightstyle.css", NULL);
 
 
         GFile *styles = g_file_new_for_path (csspath);
@@ -1727,7 +1727,7 @@ epub_document_add_mathJax(gchar* containeruri,gchar* documentdir)
 	GString *mathjaxdir = g_string_new(MATHJAX_DIRECTORY);
 
 	gchar *mathjaxref = g_filename_to_uri(mathjaxdir->str,NULL,NULL);
-	gchar *nodedata = g_strdup_printf("%s/MathJax.js?config=TeX-AMS-MML_SVG",mathjaxref);
+	gchar *nodedata = g_strconcat (mathjaxref, "/MathJax.js?config=TeX-AMS-MML_SVG", NULL);
 
 	open_xml_document(containerfilename);
 	set_xml_root_node(NULL);
@@ -1746,7 +1746,7 @@ epub_document_add_mathJax(gchar* containeruri,gchar* documentdir)
 		if (mathml != NULL &&
 		    !xmlStrcmp(mathml, (xmlChar*)"mathml") ) {
 			gchar *href = (gchar*)xml_get_data_from_node(item, XML_ATTRIBUTE, (xmlChar*)"href");
-			gchar *filename = g_strdup_printf("%s/%s",documentdir,href);
+			gchar *filename = g_build_filename (documentdir, href, NULL);
 
 			add_mathjax_script_node_to_file(filename,nodedata);
 			g_free(href);
