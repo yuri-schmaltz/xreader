@@ -23,6 +23,11 @@ option('epub',
     value: true,
     description: 'Support for the epub backend'
 )
+option('fuzz',
+    type: 'feature',
+    value: 'disabled',
+    description: 'Build the libFuzzer harnesses (requires clang + libFuzzer)'
+)
 option('pdf',
     type: 'boolean',
     value: true,
