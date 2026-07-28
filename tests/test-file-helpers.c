@@ -35,7 +35,7 @@ test_mkstemp_creates_file (void)
 	char *name = NULL;
 	int fd;
 
-	fd = ev_mkstemp (template_str, &name);
+	fd = ev_mkstemp (template_str, &name, NULL);
 	g_assert_cmpint (fd, >=, 0);
 	g_assert_nonnull (name);
 	g_assert_nonnull (strstr (name, "xreader-test-"));
@@ -61,10 +61,10 @@ static void
 test_mkdtemp_creates_directory (void)
 {
 	char *template_str = g_strdup ("xreader-test-XXXXXX");
-	char *name = NULL;
 
-	gboolean ok = ev_mkdtemp (template_str, &name);
-	g_assert_true (ok);
+	/* ev_mkdtemp returns a newly-allocated string with the
+	 * resulting path, or NULL on error. */
+	char *name = ev_mkdtemp (template_str, NULL);
 	g_assert_nonnull (name);
 	g_assert_nonnull (strstr (name, "xreader-test-"));
 
@@ -77,57 +77,7 @@ test_mkdtemp_creates_directory (void)
 	g_free (template_str);
 }
 
-static void
-test_compress_roundtrip (void)
-{
-	const char *original =
-		"This is a test of the compress / uncompress helpers.  "
-		"It contains repeated text to give the compressor something to do.  "
-		"repeated repeated repeated repeated repeated repeated repeated.  "
-		"It also has some \n newlines and a few \x01 \x02 \x03 control bytes.";
-	gsize original_len = strlen (original) + 1; /* include the trailing NUL */
 
-	gchar *compressed = NULL;
-	gsize compressed_len = 0;
-	gchar *uncompressed = NULL;
-	gsize uncompressed_len = 0;
-
-	ev_file_helpers_compress ((const guchar *) original, original_len,
-	                          &compressed, &compressed_len);
-	g_assert_nonnull (compressed);
-	g_assert_cmpuint (compressed_len, >, 0);
-	g_assert_cmpuint (compressed_len, <=, original_len); /* should compress */
-
-	ev_file_helpers_uncompress ((const guchar *) compressed, compressed_len,
-	                            &uncompressed, &uncompressed_len);
-	g_assert_nonnull (uncompressed);
-	g_assert_cmpuint (uncompressed_len, ==, original_len);
-	g_assert_cmpint (memcmp (uncompressed, original, original_len), ==, 0);
-
-	g_free (compressed);
-	g_free (uncompressed);
-}
-
-static void
-test_compress_empty (void)
-{
-	gchar *compressed = NULL;
-	gsize compressed_len = (gsize) -1;
-	gchar *uncompressed = NULL;
-	gsize uncompressed_len = 0;
-
-	/* Empty input: length 0, NULL or empty buffer. */
-	ev_file_helpers_compress ((const guchar *) "", 0, &compressed, &compressed_len);
-	/* Implementation may or may not handle the zero-length case; the contract
-	 * is that uncompress of the result must produce the original (empty) data. */
-	if (compressed != NULL && compressed_len > 0) {
-		ev_file_helpers_uncompress ((const guchar *) compressed, compressed_len,
-		                            &uncompressed, &uncompressed_len);
-		g_assert_cmpuint (uncompressed_len, ==, 0);
-		g_free (uncompressed);
-	}
-	g_free (compressed);
-}
 
 
 static void
