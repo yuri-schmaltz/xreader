@@ -2,9 +2,8 @@ Source: xreader
 Section: x11
 Priority: optional
 Maintainer: Linux Mint <root@linuxmint.com>
-Build-Depends: debhelper-compat (= 12),
+Build-Depends: debhelper-compat (= 13),
                gobject-introspection,
-               intltool,
                libarchive-dev (>= 3.6.0),
                libdjvulibre-dev,
                libgail-3-dev,
@@ -24,13 +23,12 @@ Build-Depends: debhelper-compat (= 12),
                libxapp-dev (>= 2.5.0),
                libx11-dev,
                libxml2-dev,
-               lsb-release,
                mate-common (>= 1.12),
                meson,
                xsltproc,
                yelp-tools,
                zlib1g-dev,
-Standards-Version: 3.9.6
+Standards-Version: 4.6.2
 Homepage: http://github.com/linuxmint/xreader/
 
 Package: xreader
