@@ -377,34 +377,42 @@ job_finished_callback (EvJobAnnots          *job,
                                 case EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT:
                                         if (!highlight_icon) {
                                                 /* FIXME: use better icon than select all */
-                                                highlight_icon = gtk_widget_render_icon_pixbuf (priv->tree_view,
-                                                                                                GTK_STOCK_SELECT_ALL,
-                                                                                                GTK_ICON_SIZE_BUTTON);
+                                                highlight_icon = gtk_icon_theme_load_icon (
+                                                        gtk_icon_theme_get_default (),
+                                                        "xsi-edit-select-all-symbolic",
+                                                        GTK_ICON_SIZE_BUTTON,
+                                                        0, NULL);
                                         }
                                         pixbuf = highlight_icon;
 
                                         break;
                                 case EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT:
                                         if (!strike_out_icon) {
-                                                strike_out_icon = gtk_widget_render_icon_pixbuf (priv->tree_view,
-                                                                                                 GTK_STOCK_STRIKETHROUGH,
-                                                                                                 GTK_ICON_SIZE_BUTTON);
+                                                strike_out_icon = gtk_icon_theme_load_icon (
+                                                        gtk_icon_theme_get_default (),
+                                                        "xsi-format-text-strikethrough-symbolic",
+                                                        GTK_ICON_SIZE_BUTTON,
+                                                        0, NULL);
                                         }
                                         pixbuf = strike_out_icon;
                                         break;
                                 case EV_ANNOTATION_TEXT_MARKUP_UNDERLINE:
                                         if (!underline_icon) {
-                                                underline_icon = gtk_widget_render_icon_pixbuf (priv->tree_view,
-                                                                                                GTK_STOCK_UNDERLINE,
-                                                                                                GTK_ICON_SIZE_BUTTON);
+                                                underline_icon = gtk_icon_theme_load_icon (
+                                                        gtk_icon_theme_get_default (),
+                                                        "xsi-format-text-underline-symbolic",
+                                                        GTK_ICON_SIZE_BUTTON,
+                                                        0, NULL);
                                         }
                                         pixbuf = underline_icon;
                                         break;
                                 case EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY:
                                         if (!squiggly_icon) {
-                                                squiggly_icon = gtk_widget_render_icon_pixbuf (priv->tree_view,
-                                                                                               GTK_STOCK_UNDERLINE,
-                                                                                               GTK_ICON_SIZE_BUTTON);
+                                                squiggly_icon = gtk_icon_theme_load_icon (
+                                                        gtk_icon_theme_get_default (),
+                                                        "xsi-format-text-underline-symbolic",
+                                                        GTK_ICON_SIZE_BUTTON,
+                                                        0, NULL);
                                         }
                                         pixbuf = squiggly_icon;
                                         break;
