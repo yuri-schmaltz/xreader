@@ -34,6 +34,7 @@ apt install gobject-introspection libdjvulibre-dev libgail-3-dev          \
             libgirepository1.0-dev libgtk-3-dev libgxps-dev               \
             libkpathsea-dev libpoppler-glib-dev libsecret-1-dev           \
             libspectre-dev libtiff-dev libwebkit2gtk-4.1-dev libxapp-dev  \
+            libzip-dev                                                  \
             mate-common meson xsltproc yelp-tools
 ```
 ##### Download the source-code to your machine:
