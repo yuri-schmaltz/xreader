@@ -188,3 +188,30 @@ install-sh
 test-driver
 compile
 /Build (GNU)/
+
+
+# Meson build directories (default 'build' or any user-chosen name)
+/build/
+/builddir/
+/build-san/
+/build-fuzz/
+
+
+# Fuzzer artifacts (PR #13, PR #19).  The CI fuzz job writes
+# crashing inputs into fuzz-crashes/ in the repo root; the local
+# fuzzer run writes the seed corpus into fuzz-corpus/.  Both are
+# regenerable from a clean checkout.
+/fuzz-corpus/
+/fuzz-crashes/
+
+
+# Editor / IDE scratch files
+.vscode/
+.idea/
+.cache/
+.deps/
+
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
