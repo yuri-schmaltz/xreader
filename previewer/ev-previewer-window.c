@@ -560,7 +560,7 @@ ev_previewer_window_constructor (GType                  type,
 			       "name", "PageSelector",
 			       "label", _("Page"),
 			       "tooltip", _("Select Page"),
-			       "icon_name", "text-x-generic",
+			       "icon_name", "xsi-text-x-generic-symbolic",
 			       "visible_overflown", FALSE,
 			       NULL);
 	ev_page_action_set_model (EV_PAGE_ACTION (action), window->model);
