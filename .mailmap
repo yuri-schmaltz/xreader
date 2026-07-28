@@ -1,0 +1,85 @@
+# .mailmap -- canonical author/email map for git shortlog and git blame
+#
+# Syntax (one entry per line, see gitmailmap(5)):
+#
+#   <proper-name> <proper-email>  <commit-name> <commit-email>
+#   <proper-name> <proper-email>
+#
+# The first column is the "real" identity.  Subsequent columns are
+# aliases that should be folded into the real one.  The file is
+# applied bottom-up, so put the most specific entries first.
+#
+# Generated from `git log --format='%an <%ae>' | sort | uniq -c`,
+# 2026-07-28.  Comments name the upstream variation that was
+# unified; the actual project policy is "use the most recent
+# canonical form for the canonical identity".
+
+# --- Linux Mint core team (frequent committers, name orderings) ---
+
+# Moser Peter <peter.moser@unibz.it>  ->  Peter Moser <p.moser@noi.bz.it>
+Peter Moser                  <p.moser@noi.bz.it>             Moser Peter                  <peter.moser@unibz.it>
+Peter Moser                  <p.moser@noi.bz.it>             Peter Moser                  <pitiz29a@gmail.com>
+Piiit                        <pitiz29a@gmail.com>
+
+# icarter09 / Isaac Carter (same person, GitHub account + Google account)
+Isaac Carter                 <icarter1391@gmail.com>         icarter09                    <icarter1391@gmail.com>
+Isaac Carter                 <icarter1391@gmail.com>         Isaac Carter                 <icarter1391@gmail.com>
+
+# Monsta / monsta (display-case difference)
+Monsta                       <monsta@inbox.ru>               monsta                       <monsta@inbox.ru>
+
+# Mickael Albertus / Mickael (forename truncation)
+Mickael Albertus             <mickael.albertus@gmail.com>    Mickael                      <mickael.albertus@gmail.com>
+
+# raveit65 / raveit (also: raveit has two emails)
+raveit65                     <mate@raveit.de>                raveit65                     <chat-to-me@raveit.de>
+raveit65                     <mate@raveit.de>                raveit                       <chat-to-me@raveit.de>
+raveit65                     <mate@raveit.de>                raveit                       <mate@raveit.de>
+raveit65                     <mate@raveit.de>
+
+# --- Unicode name variants (Jose/José, Musa Unal/Ünal, etc.) ---
+
+# Jose Aliste / José Aliste
+José Aliste                  <jaliste@src.gnome.org>         Jose Aliste                  <jaliste@src.gnome.org>
+
+# Musa Unal / Musa Ünal / musa / m8
+Musa Ünal                    <umusasadik@gmail.com>          Musa Unal                    <umusasadik@gmail.com>
+Musa Ünal                    <umusasadik@gmail.com>          Musa Ünal                    <umusasadik@gmail.com>
+Musa Ünal                    <umusasadik@gmail.com>          musa                         <umusasadik@gmail.com>
+Musa Ünal                    <umusasadik@gmail.com>          m8                           <umusasadik@gmail.com>
+
+# --- Same email used by multiple display names (aliases) ---
+
+# infirit / Sander Sweers (same person, evolved display name)
+Sander Sweers                <infirit@gmail.com>             infirit                      <infirit@gmail.com>
+
+# rootavish / avishkar gupta (case)
+avishkar gupta               <avishkar_gupta@outlook.com>    rootavish                    <avishkar_gupta@outlook.com>
+
+# Michael Webster (Google + GitHub)
+Michael Webster              <miketwebster@gmail.com>        Michael Webster              <262776+mtwebster@users.noreply.github.com>
+
+# Eli Schwartz (gmail + archlinux)
+Eli Schwartz                 <eschwartz93@gmail.com>         Eli Schwartz                 <eschwartz@archlinux.org>
+
+# Matthew Petroff (personal + github-no-reply)
+Matthew Petroff              <matthew@mpetroff.net>          Matthew Petroff              <github@mpetroff.net>
+
+# --- i18n bot accounts (treat as the same "author") ---
+
+# mate-i18n is a script that commits translations on behalf of the
+# project.  Attribute the script's commits to the maintainer who
+# runs the import (Clement Lefebvre, in this case).  Translations
+# coming in as a bot commit are translated in the GTK / GNOME
+# infrastructure and dropped onto the Linux Mint maintainer's
+# behalf.
+Clement Lefebvre             <clement.lefebvre@linuxmint.com>  mate-i18n                    <mate-i18n@ml.mate-desktop.org>
+
+# --- Forward-port author (the yuri-schmaltz fork's automation) ---
+
+# Anything in the form 'Name <noreply>@users.noreply.github.com' that
+# originates from a PR via the GitHub web UI is the human author
+# (whose real name is in the surrounding commit message), not
+# 'web-flow'.  Skip them here -- they are noise from the point of
+# view of the real git shortlog, but the real identity is already
+# in the original (non-noreply) commit author.
