@@ -782,7 +782,7 @@ ev_window_error_message (EvWindow    *window,
 
     area = ev_message_area_new (GTK_MESSAGE_ERROR,
                                 msg,
-                                GTK_STOCK_CLOSE,
+                                _("_Close"),
                                 GTK_RESPONSE_CLOSE,
                                 NULL);
     g_free (msg);
@@ -812,7 +812,7 @@ ev_window_warning_message (EvWindow    *window,
 
     area = ev_message_area_new (GTK_MESSAGE_WARNING,
                                 msg,
-                                GTK_STOCK_CLOSE,
+                                _("_Close"),
                                 GTK_RESPONSE_CLOSE,
                                 NULL);
     g_free (msg);
@@ -1868,11 +1868,11 @@ show_loading_progress (EvWindow *ev_window)
     text = g_strdup_printf (_("Loading document from “%s”"),
             display_name);
 
-    area = ev_progress_message_area_new (GTK_STOCK_OPEN,
+    area = ev_progress_message_area_new ("xsi-document-open-symbolic",
             text,
-            GTK_STOCK_CLOSE,
+            _("_Close"),
             GTK_RESPONSE_CLOSE,
-            GTK_STOCK_CANCEL,
+            _("_Cancel"),
             GTK_RESPONSE_CANCEL,
             NULL);
     g_signal_connect (area, "response",
@@ -2243,11 +2243,11 @@ show_reloading_progress (EvWindow *ev_window)
 
     text = g_strdup_printf (_("Reloading document from %s"),
             ev_window->priv->uri);
-    area = ev_progress_message_area_new (GTK_STOCK_REFRESH,
+    area = ev_progress_message_area_new ("xsi-view-refresh-symbolic",
             text,
-            GTK_STOCK_CLOSE,
+            _("_Close"),
             GTK_RESPONSE_CLOSE,
-            GTK_STOCK_CANCEL,
+            _("_Cancel"),
             GTK_RESPONSE_CANCEL,
             NULL);
     g_signal_connect (area, "response",
@@ -2492,9 +2492,9 @@ ev_window_cmd_file_open (GtkAction *action,
     chooser = gtk_file_chooser_dialog_new (_("Open Document"),
             GTK_WINDOW (window),
             GTK_FILE_CHOOSER_ACTION_OPEN,
-            GTK_STOCK_CANCEL,
+            _("_Cancel"),
             GTK_RESPONSE_CANCEL,
-            GTK_STOCK_OPEN, GTK_RESPONSE_OK,
+            _("_Open"), GTK_RESPONSE_OK,
             NULL);
 
     ev_document_factory_add_filters (chooser, NULL);
@@ -2888,11 +2888,11 @@ show_saving_progress (GFile *dst)
         g_assert_not_reached ();
     }
     g_free (uri);
-    area = ev_progress_message_area_new (GTK_STOCK_SAVE,
+    area = ev_progress_message_area_new ("xsi-document-save-symbolic",
             text,
-            GTK_STOCK_CLOSE,
+            _("_Close"),
             GTK_RESPONSE_CLOSE,
-            GTK_STOCK_CANCEL,
+            _("_Cancel"),
             GTK_RESPONSE_CANCEL,
             NULL);
     g_signal_connect (area, "response",
@@ -3079,8 +3079,8 @@ ev_window_cmd_save_as (GtkAction *action,
     fc = gtk_file_chooser_dialog_new (
             _("Save a Copy"),
             GTK_WINDOW (ev_window), GTK_FILE_CHOOSER_ACTION_SAVE,
-            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-            GTK_STOCK_SAVE, GTK_RESPONSE_OK,
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Save"), GTK_RESPONSE_OK,
             NULL);
 
     ev_document_factory_add_filters (fc, ev_window->priv->document);
@@ -3482,11 +3482,11 @@ ev_window_print_operation_status_changed (EvPrintOperation *op,
         job_name = ev_print_operation_get_job_name (op);
         text = g_strdup_printf (_("Printing job “%s”"), job_name);
 
-        area = ev_progress_message_area_new (GTK_STOCK_PRINT,
+        area = ev_progress_message_area_new ("xsi-document-print-symbolic",
                 text,
-                GTK_STOCK_CLOSE,
+                _("_Close"),
                 GTK_RESPONSE_CLOSE,
-                GTK_STOCK_CANCEL,
+                _("_Cancel"),
                 GTK_RESPONSE_CANCEL,
                 NULL);
         ev_window_print_update_pending_jobs_message (ev_window, 1);
@@ -3674,7 +3674,7 @@ ev_window_check_document_modified (EvWindow *ev_window)
     button = gtk_dialog_add_button (GTK_DIALOG (dialog), _("Save a _Copy"), GTK_RESPONSE_YES);
     gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Save"), GTK_RESPONSE_ACCEPT);
     gtk_dialog_add_button (GTK_DIALOG (dialog), _("Close _without Saving"), GTK_RESPONSE_NO);
-    gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+    gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Cancel"), GTK_RESPONSE_CANCEL);
 
     gtk_style_context_add_class (gtk_widget_get_style_context (button),
                                  GTK_STYLE_CLASS_SUGGESTED_ACTION);
@@ -3782,7 +3782,7 @@ ev_window_check_print_queue (EvWindow *ev_window)
                     "jobs will not be printed."));
 
     gtk_dialog_add_button (GTK_DIALOG (dialog), _("Cancel _print and Close"), GTK_RESPONSE_NO);
-    gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+    gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Cancel"), GTK_RESPONSE_CANCEL);
     button = gtk_dialog_add_button (GTK_DIALOG (dialog), _("Close _after Printing"), GTK_RESPONSE_YES);
 
     gtk_style_context_add_class (gtk_widget_get_style_context (button),
@@ -6287,7 +6287,7 @@ static const GtkActionEntry entries[] = {
                 "Escape",
                 "",
                 G_CALLBACK (ev_window_cmd_escape) },
-        { "Slash", GTK_STOCK_FIND, NULL,
+        { "Slash", NULL, NULL,
                 "slash",
                 NULL,
                 G_CALLBACK (ev_window_cmd_edit_find) },
@@ -6327,27 +6327,27 @@ static const GtkActionEntry entries[] = {
                 "<shift>Return",
                 NULL,
                 G_CALLBACK (ev_window_cmd_scroll_backward) },
-        { "p", GTK_STOCK_GO_UP, "",
+        { "p", NULL, "",
                 "p",
                 NULL,
                 G_CALLBACK (ev_window_cmd_go_previous_page) },
-        { "n", GTK_STOCK_GO_DOWN, "",
+        { "n", NULL, "",
                 "n",
                 NULL,
                 G_CALLBACK (ev_window_cmd_go_next_page) },
-        { "Plus", GTK_STOCK_ZOOM_IN, NULL,
+        { "Plus", NULL, NULL,
                 "plus",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_in) },
-        { "CtrlEqual", GTK_STOCK_ZOOM_IN, NULL,
+        { "CtrlEqual", NULL, NULL,
                 "<control>equal",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_in) },
-        { "Equal", GTK_STOCK_ZOOM_IN, NULL,
+        { "Equal", NULL, NULL,
                 "equal",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_in) },
-        { "Minus", GTK_STOCK_ZOOM_OUT, NULL,
+        { "Minus", NULL, NULL,
                 "minus",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_out) },
@@ -6363,23 +6363,23 @@ static const GtkActionEntry entries[] = {
                 "<shift>Page_Down",
                 NULL,
                 G_CALLBACK (ev_window_cmd_go_forward) },
-        { "KpPlus", GTK_STOCK_ZOOM_IN, NULL,
+        { "KpPlus", NULL, NULL,
                 "KP_Add",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_in) },
-        { "KpMinus", GTK_STOCK_ZOOM_OUT, NULL,
+        { "KpMinus", NULL, NULL,
                 "KP_Subtract",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_out) },
-        { "CtrlKpPlus", GTK_STOCK_ZOOM_IN, NULL,
+        { "CtrlKpPlus", NULL, NULL,
                 "<control>KP_Add",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_in) },
-        { "CtrlKpMinus", GTK_STOCK_ZOOM_OUT, NULL,
+        { "CtrlKpMinus", NULL, NULL,
                 "<control>KP_Subtract",
                 NULL,
                 G_CALLBACK (ev_window_cmd_view_zoom_out) },
-        { "CtrlInsert", GTK_STOCK_COPY, NULL,
+        { "CtrlInsert", NULL, NULL,
                 "<control>Insert",
                 NULL,
                 G_CALLBACK (ev_window_cmd_edit_copy) },
@@ -6424,7 +6424,7 @@ static const GtkToggleActionEntry toggle_entries[] = {
                  NULL,
                  N_("Browse the document from right to left"),
                  G_CALLBACK (ev_window_cmd_rtl), FALSE },
-         { "ViewFullscreen", GTK_STOCK_FULLSCREEN, N_("_Fullscreen"),
+         { "ViewFullscreen", "xsi-view-fullscreen-symbolic", N_("_Fullscreen"),
                  "F11",
                  N_("Expand the window to fill the screen"),
                  G_CALLBACK (ev_window_cmd_view_fullscreen) },
@@ -6619,7 +6619,7 @@ register_custom_actions (EvWindow       *window,
             "name", "FileOpenRecent",
             "label", _("_Open…"),
             "tooltip", _("Open an existing document"),
-            "stock_id", GTK_STOCK_OPEN,
+            "icon-name", "xsi-document-open-symbolic",
             NULL);
     g_signal_connect (action, "activate",
             G_CALLBACK (ev_window_cmd_file_open), window);
@@ -7182,9 +7182,9 @@ ev_view_popup_cmd_save_image_as (GtkAction *action,
     fc = gtk_file_chooser_dialog_new (_("Save Image"),
             GTK_WINDOW (window),
             GTK_FILE_CHOOSER_ACTION_SAVE,
-            GTK_STOCK_CANCEL,
+            _("_Cancel"),
             GTK_RESPONSE_CANCEL,
-            GTK_STOCK_SAVE, GTK_RESPONSE_OK,
+            _("_Save"), GTK_RESPONSE_OK,
             NULL);
 
     gtk_dialog_set_default_response (GTK_DIALOG (fc), GTK_RESPONSE_OK);
@@ -7435,9 +7435,9 @@ ev_attachment_popup_cmd_save_attachment_as (GtkAction *action,
             _("Save Attachment"),
             GTK_WINDOW (window),
             attachment ? GTK_FILE_CHOOSER_ACTION_SAVE : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                    GTK_STOCK_CANCEL,
+                    _("_Cancel"),
                     GTK_RESPONSE_CANCEL,
-                    GTK_STOCK_SAVE, GTK_RESPONSE_OK,
+                    _("_Save"), GTK_RESPONSE_OK,
                     NULL);
 
     gtk_dialog_set_default_response (GTK_DIALOG (fc), GTK_RESPONSE_OK);
