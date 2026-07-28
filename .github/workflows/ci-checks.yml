@@ -219,3 +219,29 @@ jobs:
           name: fuzz-crashes
           path: fuzz-crashes/
           if-no-files-found: ignore
+  # Lint the commit messages of all commits on the PR branch
+  # (push events only get the last 10 commits checked, to keep
+  # the run time bounded).
+  commit-lint:
+    name: Commit message lint
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Lint commit messages
+        run: |
+          set -e
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # PR: lint every commit the PR added on top of master.
+            range="origin/master..HEAD"
+          else
+            # push: lint the last 10 commits (the rest would be
+            # covered by their own PRs at the time they landed).
+            range="HEAD~10..HEAD"
+          fi
+          echo "Linting range: $range"
+          ./tools/lint-commits.sh "$range"
