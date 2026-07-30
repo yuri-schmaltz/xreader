@@ -236,3 +236,21 @@ test(
     test_tabbed_integration,
     protocol: 'gtest',
 )
+
+test_session_roundtrip = executable(
+    'test-session-roundtrip',
+    'test-session-roundtrip.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-session-roundtrip"',
+    ],
+)
+
+test(
+    'test-session-roundtrip',
+    test_session_roundtrip,
+    protocol: 'gtest',
+)
