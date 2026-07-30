@@ -66,6 +66,29 @@
    <mimetype>image/x-xpixmap</mimetype>
  </mimetypes>
  <releases>
+    <release version="4.8.0" date="2026-07-30">
+      <description>
+        <p>30 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
+        <ul>
+          <li>NEW: C3 Tabbed view (PRs #96-#107) -- open multiple documents in tabs in a single window. Keyboard shortcuts (Ctrl+Tab, Ctrl+W, Ctrl+Shift+T), drag-and-drop, reopen-closed-tab, session save/restore. --tabbed / -T CLI flag + tabbed-mode GSettings.</li>
+          <li>gtk-doc blocks on 9 public headers (PRs #52, #56-#60)</li>
+          <li>12 G_GNUC_NONNULL + 1 G_GNUC_PURE + 5 G_GNUC_MALLOC + 4 G_GNUC_WARN_UNUSED_RESULT + 3 G_GNUC_PRINTF annotations (PRs #43, #61-#63)</li>
+          <li>g_slice_* -> g_new/g_free in 4 files (PR #64)</li>
+          <li>g_get_current_time -> g_get_real_time in ev-file-helpers.c (PR #65)</li>
+          <li>strcasecmp -> g_ascii_strcasecmp in ev-document.c (PR #66)</li>
+          <li>6 new CI jobs: clang-tidy, iwyu, valgrind, coverity-scan, ARM64, clang (PRs #67-#71, #80) -- 12 total</li>
+          <li>_FORTIFY_SOURCE=3 + -fstack-protector-strong (PR #81)</li>
+          <li>tools/lint-branches.sh (PR #85)</li>
+          <li>ev_form_field_type_to_string / _from_string helpers (PR #78) + 9 unit tests (PR #79)</li>
+          <li>ev_rectangle_intersect helper (PR #87) + 9 unit tests (PR #88)</li>
+          <li>7 GAction entries (B1 phase 1) -- quit, help, about, open-location, print, save, find (PRs #76, #77, #89)</li>
+          <li>Flatpak + Snap manifests (PRs #74, #75)</li>
+          <li>AppStream expansion (PR #73)</li>
+          <li>Full doc set: CONTRIBUTING, CODE_OF_CONDUCT, SUPPORT, ARCHITECTURE, ROADMAP, GACTION_MIGRATION, TABBED_VIEW + TABBED_VIEW_TEST_PLAN (PRs #91-#95, #103, #105)</li>
+          <li>96 unit tests across 11 executables + 2 fuzz harnesses with 11 seeds</li>
+        </ul>
+      </description>
+    </release>
     <release version="4.7.0" date="2026-07-28">
       <description>
         <p>31 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
