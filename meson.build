@@ -194,6 +194,8 @@ cpp_args = [
     '-DXREADER_LOCALE_DIR="@0@"'.format(join_paths(prefix, datadir, 'locale')),
     '-DXREADER_COMPILATION',
     '-DHAVE_CONFIG_H',
+    '-D_FORTIFY_SOURCE=3',
+    '-fstack-protector-strong',
 ]
 
 if get_option('enable_debug')
