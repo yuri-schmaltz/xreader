@@ -18,8 +18,54 @@
   </p>
  </_description>
  <url type="homepage">http://github.com/linuxmint/xreader</url>
+ <url type="bugtracker">http://github.com/linuxmint/xreader/issues</url>
  <project_group>Linux Mint</project_group>
-  <releases>
+ <developer_name>Linux Mint Team</developer_name>
+ <screenshots>
+   <screenshot type="default">
+     <caption>Xreader displaying a PDF document</caption>
+     <image>https://raw.githubusercontent.com/linuxmint/xreader/master/data/screenshot-main.png</image>
+   </screenshot>
+   <screenshot>
+     <caption>The bookmarks sidebar</caption>
+     <image>https://raw.githubusercontent.com/linuxmint/xreader/master/data/screenshot-bookmarks.png</image>
+   </screenshot>
+ </screenshots>
+ <categories>
+   <category>Office</category>
+   <category>Viewer</category>
+ </categories>
+ <keywords>
+   <keyword>pdf</keyword>
+   <keyword>djvu</keyword>
+   <keyword>dvi</keyword>
+   <keyword>xps</keyword>
+   <keyword>epub</keyword>
+   <keyword>comics</keyword>
+   <keyword>document</keyword>
+   <keyword>viewer</keyword>
+   <keyword>cbz</keyword>
+   <keyword>cbr</keyword>
+   <keyword>postscript</keyword>
+ </keywords>
+ <provides>
+   <binary>xreader</binary>
+   <binary>xreader-previewer</binary>
+   <binary>xreader-thumbnailer</binary>
+ </provides>
+ <mimetypes>
+   <mimetype>application/pdf</mimetype>
+   <mimetype>application/postscript</mimetype>
+   <mimetype>application/x-dvi</mimetype>
+   <mimetype>application/x-cbr</mimetype>
+   <mimetype>application/x-cbz</mimetype>
+   <mimetype>application/x-xz-compressed-tar</mimetype>
+   <mimetype>application/oxps</mimetype>
+   <mimetype>image/vnd.djvu</mimetype>
+   <mimetype>image/tiff</mimetype>
+   <mimetype>image/x-xpixmap</mimetype>
+ </mimetypes>
+ <releases>
     <release version="4.7.0" date="2026-07-28">
       <description>
         <p>31 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
