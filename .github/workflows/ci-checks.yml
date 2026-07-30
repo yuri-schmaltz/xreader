@@ -18,14 +18,23 @@ jobs:
   # to a deprecated glib API still present in 22.04's libraries,
   # or a missing -Wno-foo flag in the 24.04 default compiler).
   warnings:
-    name: Strict warnings (${{ matrix.distro }})
+    name: Strict warnings (${{ matrix.distro }}/${{ matrix.arch }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        distro: [ubuntu-22.04, ubuntu-24.04]
+        include:
+          - distro: ubuntu-22.04
+            arch: amd64
+            image: ubuntu-22.04
+          - distro: ubuntu-24.04
+            arch: amd64
+            image: ubuntu-24.04
+          - distro: ubuntu-24.04
+            arch: arm64
+            image: ubuntu:24.04
     container:
-      image: ubuntu:${{ matrix.distro == 'ubuntu-22.04' && '22.04' || '24.04' }}
+      image: ${{ matrix.image }}
     steps:
       - name: Install dependencies
         run: |
