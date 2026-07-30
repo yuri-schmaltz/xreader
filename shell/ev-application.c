@@ -1038,8 +1038,51 @@ open_location_action_activate (GSimpleAction *action,
 	                                   EV_WINDOW_MODE_NORMAL, NULL, 0);
 }
 
+static void
+quit_action_activate (GSimpleAction *action,
+                      GVariant      *parameter,
+                      gpointer       user_data)
+{
+	EvApplication *application = EV_APPLICATION (user_data);
+
+	g_application_quit (G_APPLICATION (application));
+}
+
+static void
+help_action_activate (GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
+{
+	EvApplication *application = EV_APPLICATION (user_data);
+
+	ev_application_show_help (application, NULL);
+}
+
+static void
+about_action_activate (GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+	const gchar *authors[] = {
+		"Mavis",
+		NULL
+	};
+
+	gtk_show_about_dialog (NULL,
+			      "program-name", "Xreader",
+			      "version", VERSION,
+			      "copyright", "Copyright (C) 2002-2026 The Xreader Authors",
+			      "license-type", GTK_LICENSE_GPL_2_0,
+			      "authors", authors,
+			      "website", "https://github.com/yuri-schmaltz/xreader",
+			      NULL);
+}
+
 static const GActionEntry app_actions[] = {
 	{ "open-location", open_location_action_activate, "s" },
+	{ "quit",         quit_action_activate,           NULL },
+	{ "help",         help_action_activate,           NULL },
+	{ "about",        about_action_activate,          NULL },
 };
 
 ev_application_class_init (EvApplicationClass *ev_application_class)
