@@ -28,11 +28,11 @@
 
 G_BEGIN_DECLS
 
-gboolean    ev_init           (void);
+gboolean    ev_init           (void) G_GNUC_WARN_UNUSED_RESULT;
 
 void        ev_shutdown       (void);
 
-gboolean   _ev_is_initialized (void);
+gboolean   _ev_is_initialized (void) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
 
