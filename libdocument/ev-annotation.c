@@ -807,7 +807,7 @@ static void
 ev_annotation_markup_props_free (EvAnnotationMarkupProps *props)
 {
 	g_free (props->label);
-	g_slice_free (EvAnnotationMarkupProps, props);
+	g_free(props);
 }
 
 static EvAnnotationMarkupProps *
@@ -821,7 +821,7 @@ ev_annotation_markup_get_properties (EvAnnotationMarkup *markup)
 
 	props = g_object_get_qdata (G_OBJECT (markup), props_key);
 	if (!props) {
-		props = g_slice_new0 (EvAnnotationMarkupProps);
+		props = g_new0(EvAnnotationMarkupProps, 1);
 		g_object_set_qdata_full (G_OBJECT (markup),
 					 props_key, props,
 					 (GDestroyNotify) ev_annotation_markup_props_free);

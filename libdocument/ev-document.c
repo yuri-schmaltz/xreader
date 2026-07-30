@@ -757,7 +757,7 @@ ev_source_link_new (const gchar *filename,
 		    gint 	 line,
 		    gint 	 col)
 {
-	EvSourceLink *link = g_slice_new (EvSourceLink);
+	EvSourceLink *link = g_new(EvSourceLink, 1);
 
 	link->filename = g_strdup (filename);
 	link->line = line;
@@ -773,7 +773,7 @@ ev_source_link_copy (EvSourceLink *link)
 
 	g_return_val_if_fail (link != NULL, NULL);
 
-	copy = g_slice_new (EvSourceLink);
+	copy = g_new(EvSourceLink, 1);
 
 	*copy = *link;
 	copy->filename = g_strdup (link->filename);
@@ -788,7 +788,7 @@ ev_source_link_free (EvSourceLink *link)
 		return;
 
 	g_free (link->filename);
-	g_slice_free (EvSourceLink, link);
+	g_free(link);
 }
 
 /* EvDocumentInfo */

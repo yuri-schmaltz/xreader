@@ -111,7 +111,7 @@ ev_mapping_list_new (guint          page,
 
 	g_return_val_if_fail (data_destroy_func != NULL, NULL);
 
-	mapping_list = g_slice_new (EvMappingList);
+	mapping_list = g_new(EvMappingList, 1);
 	mapping_list->page = page;
 	mapping_list->list = list;
 	mapping_list->data_destroy_func = data_destroy_func;
@@ -150,7 +150,7 @@ ev_mapping_list_unref (EvMappingList *mapping_list)
 				(GFunc)mapping_list_free_foreach,
 				mapping_list->data_destroy_func);
 		g_list_free (mapping_list->list);
-		g_slice_free (EvMappingList, mapping_list);
+		g_free(mapping_list);
 	}
 }
 
