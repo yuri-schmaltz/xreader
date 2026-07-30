@@ -186,6 +186,8 @@ EvMapping       *ev_document_synctex_forward_search
 
 gint             ev_rect_cmp                      (EvRectangle     *a,
 					           EvRectangle     *b);
+gboolean         ev_rectangle_intersect           (const EvRectangle *a,
+                                                   const EvRectangle *b);
 void            ev_document_toggle_night_mode     (EvDocument *document,gboolean night);
 void			ev_document_check_add_night_sheet (EvDocument *document);
 
