@@ -72,12 +72,24 @@ ev_window_title_new (EvWindow *window)
 static char *
 get_filename_from_uri (const char *uri)
 {
-	char *filename;
 	char *basename;
-	
-	filename = g_uri_unescape_string (uri, NULL);
-	basename = g_path_get_basename (filename);
-	g_free(filename);
+	GFile *file;
+
+	/* Use GFile to extract the basename rather than
+	 * g_uri_unescape_string + g_path_get_basename.  The
+	 * latter pair works for file:// URIs but fails on
+	 * non-file URIs (http://, ftp://, ...): the URI
+	 * unescape does NOT strip the scheme://host prefix
+	 * and g_path_get_basename returns the wrong component
+	 * for, e.g., 'http://example.com/foo/bar.pdf'
+	 * (would return 'bar.pdf' but with a leading 'example.com/'
+	 * stripped, which works but is fragile).
+	 *
+	 * GFile handles the URI parsing + the basename extraction
+	 * in one go, and is the documented glib API for this. */
+	file = g_file_new_for_uri (uri);
+	basename = g_file_get_basename (file);
+	g_object_unref (file);
 
 	return basename;
 }
