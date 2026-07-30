@@ -110,6 +110,13 @@ typedef enum {
 #define EGG_DESKTOP_FILE_KEY_STARTUP_WM_CLASS	"StartupWMClass"
 #define EGG_DESKTOP_FILE_KEY_URL		"URL"
 
+/* Maximum length of an Exec= line in a .desktop file.
+ * Real-world values are well under 1 KB; 32 KB is a
+ * defence-in-depth cap that prevents a hostile .desktop
+ * file from blowing up the launcher's command-string
+ * construction loop. */
+#define EGG_DESKTOP_FILE_MAX_EXEC_LENGTH		(32 * 1024)
+
 /* Accessors */
 gboolean  egg_desktop_file_has_key                (EggDesktopFile  *desktop_file,
 						   const char      *key,
