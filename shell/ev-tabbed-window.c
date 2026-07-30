@@ -45,6 +45,20 @@ static gboolean on_key_pressed (GtkEventControllerKey *controller,
                                 GdkModifierType        state,
                                 gpointer               user_data);
 
+static void on_page_drop (GtkNotebook       *notebook,
+                          EvTab             *tab,
+                          GdkDragContext     *context,
+                          gint                x,
+                          gint                y,
+                          gpointer            user_data);
+
+static void on_empty_drop (GtkWidget         *widget,
+                           GdkDragContext     *context,
+                           gint                x,
+                           gint                y,
+                           guint               time,
+                           gpointer            user_data);
+
 static void
 update_tab_bar_visibility (EvTabbedWindow *window)
 {
@@ -226,6 +240,17 @@ on_tab_added (EvTabManager    *manager,
 	g_signal_connect (tab, "notify::title", G_CALLBACK (on_tab_changed), tab_label);
 	g_signal_connect (tab, "notify::tooltip", G_CALLBACK (on_tab_changed), tab_label);
 
+	/* Drag-and-drop: each notebook page is a drop target for files.
+	 * Dropping a file on a tab focuses that tab and opens the file
+	 * in a new tab (or focuses an already-open tab with the same
+	 * file).  The drop happens via the 'page-drop' signal on the
+	 * notebook (production-ready since GTK 3.16). */
+	gtk_drag_dest_set (GTK_WIDGET (tab), GTK_DEST_DEFAULT_ALL,
+	                   NULL, 0, GDK_ACTION_COPY);
+	gtk_drag_dest_add_uri_targets (GTK_WIDGET (tab));
+	g_signal_connect (tab, "drag-data-received",
+	                  G_CALLBACK (on_page_drop), window);
+
 	gtk_notebook_set_current_page (GTK_NOTEBOOK (window->priv->notebook), page_num);
 	update_tab_bar_visibility (window);
 	update_window_title (window);
@@ -315,6 +340,15 @@ ev_tabbed_window_init (EvTabbedWindow *window)
 	gtk_widget_set_halign (window->priv->empty_label, GTK_ALIGN_CENTER);
 	gtk_box_pack_start (GTK_BOX (window->priv->main_box),
 	                    window->priv->empty_label, TRUE, TRUE, 0);
+
+	/* The empty-state label is also a drop target.  When the
+	 * user drags a file to a window with no tabs, the file
+	 * is opened in a new tab. */
+	gtk_drag_dest_set (window->priv->empty_label,
+	                   GTK_DEST_DEFAULT_ALL, NULL, 0, GDK_ACTION_COPY);
+	gtk_drag_dest_add_uri_targets (window->priv->empty_label);
+	g_signal_connect (window->priv->empty_label, "drag-data-received",
+	                  G_CALLBACK (on_empty_drop), window);
 
 	window->priv->statusbar = gtk_statusbar_new ();
 	gtk_box_pack_end (GTK_BOX (window->priv->main_box),
@@ -504,4 +538,67 @@ ev_tabbed_window_get_reopen_stack_size (EvTabbedWindow *window)
 {
 	g_return_val_if_fail (EV_IS_TABBED_WINDOW (window), 0);
 	return ev_tab_manager_get_reopen_stack_size (window->priv->tab_manager);
+}
+
+/* --- drag-and-drop handlers --- */
+
+/* Extract the first file URI from a "drag-data-received" event
+ * and return it as a GFile.  Returns NULL if no file URI was
+ * found. */
+static GFile *
+extract_first_file_from_selection (GtkSelectionData *selection)
+{
+	const gchar *uri_list = (const gchar *) gtk_selection_data_get_data (selection);
+	if (!uri_list || !*uri_list)
+		return NULL;
+
+	/* The URI list is newline-separated.  Take the first non-empty
+	 * line. */
+	const gchar *p = uri_list;
+	const gchar *end = p;
+	while (*end && *end != '\n' && *end != '\r')
+		end++;
+
+	gsize len = end - p;
+	if (len == 0)
+		return NULL;
+
+	gchar *first_uri = g_strndup (p, len);
+	GFile *file = g_file_new_for_uri (first_uri);
+	g_free (first_uri);
+	return file;
+}
+
+static void
+on_page_drop (GtkWidget         *widget,
+              GdkDragContext    *context,
+              gint               x,
+              gint               y,
+              GtkSelectionData  *selection,
+              guint              info,
+              guint              time,
+              gpointer           user_data)
+{
+	EvTabbedWindow *window = EV_TABBED_WINDOW (user_data);
+	GFile *file = extract_first_file_from_selection (selection);
+	if (file) {
+		ev_tabbed_window_open_file (window, file, NULL);
+		g_object_unref (file);
+		gtk_drag_finish (context, TRUE, FALSE, time);
+	} else {
+		gtk_drag_finish (context, FALSE, FALSE, time);
+	}
+}
+
+static void
+on_empty_drop (GtkWidget         *widget,
+               GdkDragContext    *context,
+               gint               x,
+               gint               y,
+               GtkSelectionData  *selection,
+               guint              info,
+               guint              time,
+               gpointer           user_data)
+{
+	on_page_drop (widget, context, x, y, selection, info, time, user_data);
 }
