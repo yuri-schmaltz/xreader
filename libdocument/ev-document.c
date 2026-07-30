@@ -726,7 +726,7 @@ ev_document_find_page_by_label (EvDocument  *document,
 	/* Second, look for a match with case insensitively */
 	for (i = 0; priv->page_labels && i < priv->n_pages; i++) {
 		if (priv->page_labels[i] != NULL &&
-		    ! strcasecmp (page_label, priv->page_labels[i])) {
+		    ! g_ascii_strcasecmp (page_label, priv->page_labels[i])) {
 			*page_index = i;
 			return TRUE;
 		}
