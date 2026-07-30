@@ -1022,6 +1022,26 @@ ev_application_dbus_unregister (GApplication    *gapplication,
 #endif /* ENABLE_DBUS */
 
 static void
+static void
+open_location_action_activate (GSimpleAction *action,
+                                GVariant      *parameter,
+                                gpointer       user_data)
+{
+	EvApplication *application = EV_APPLICATION (user_data);
+	const gchar *uri = NULL;
+
+	if (parameter != NULL) {
+		g_variant_get (parameter, "&s", &uri);
+	}
+
+	ev_application_open_uri_at_dest (application, uri, NULL, NULL,
+	                                   EV_WINDOW_MODE_NORMAL, NULL, 0);
+}
+
+static const GActionEntry app_actions[] = {
+	{ "open-location", open_location_action_activate, "s" },
+};
+
 ev_application_class_init (EvApplicationClass *ev_application_class)
 {
         GApplicationClass *g_application_class = G_APPLICATION_CLASS (ev_application_class);
@@ -1049,6 +1069,17 @@ ev_application_init (EvApplication *ev_application)
     ev_application_init_session (ev_application);
 
 	ev_application_accel_map_load (ev_application);
+
+	/* Register the GAction namespace.  These actions are
+	 * parallel to the old GtkAction paths (which are still
+	 * active) and provide a forward-compatible API for new
+	 * code.  The eventual ev-window.c GAction migration
+	 * (B1) will switch the menu definitions one-by-one to
+	 * use these namespaced actions. */
+	g_action_map_add_action_entries (G_ACTION_MAP (ev_application),
+	                                 app_actions,
+	                                 G_N_ELEMENTS (app_actions),
+	                                 ev_application);
 
     parse_mimetypes ();
 
