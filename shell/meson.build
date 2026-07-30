@@ -14,6 +14,8 @@ shell_sources = [
     'ev-file-monitor.h',
     'ev-file-monitor.c',
     'ev-history.c',
+    'ev-tab.h',
+    'ev-tab.c',
     'ev-history.h',
     'ev-history-action.c',
     'ev-history-action.h',
