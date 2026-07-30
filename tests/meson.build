@@ -50,3 +50,30 @@ test(
     test_mime,
     protocol: 'gtest',
 )
+
+test_document_factory = executable(
+    'test-document-factory',
+    'test-document-factory.c',
+    '../libdocument/ev-file-helpers.c',
+    '../libdocument/ev-init.c',
+    '../libdocument/ev-debug.c',
+    '../libdocument/ev-backends-manager.c',
+    '../libdocument/ev-module.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+        gtk,
+        zlib,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-document-factory"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-document-factory',
+    test_document_factory,
+    protocol: 'gtest',
+)
