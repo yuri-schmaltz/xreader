@@ -258,3 +258,55 @@ jobs:
           fi
           echo "Linting range: $range"
           ./tools/lint-commits.sh "$range"
+  # Static analysis with cppcheck.  Catches the kinds of
+  # memory-safety, NULL-deref, and uninitialized-variable bugs
+  # that the sanitizer job (PR #8) only catches at runtime, and
+  # that the warnings job (PR #8) sometimes lets through because
+  # -Wall does not flag every CWE.  cppcheck is intentionally
+  # run with --enable=warning,style,performance,portability,info
+  # (NOT --enable=all, which generates hundreds of false
+  # positives in legacy C code).
+  cppcheck:
+    name: cppcheck static analysis
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            cppcheck \
+            build-essential \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            libzip-dev \
+            intltool \
+            pkg-config
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run cppcheck
+        run: |
+          # The libdocument + shell + libview code is the
+          # security-critical attack surface (the document
+          # parsers live there), so scan those subdirs first
+          # and fail the job on the first error.
+          set -e
+          cppcheck --quiet --error-exitcode=1 \
+            --enable=warning,style,performance,portability,info \
+            --inline-suppr \
+            --suppress=missingIncludeSystem \
+            --suppress=unusedFunction \
+            -I libdocument -I libview -I shell -I backend -I cut-n-paste -I thumbnailer -I previewer \
+            libdocument libview shell backend cut-n-paste thumbnailer previewer
