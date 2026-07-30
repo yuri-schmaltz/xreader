@@ -404,9 +404,29 @@ GtkWidget *
 ev_properties_view_new (const gchar *uri)
 {
 	EvPropertiesView *properties;
+	gchar *unescaped;
 
 	properties = g_object_new (EV_TYPE_PROPERTIES, NULL);
-	properties->uri = g_uri_unescape_string (uri, NULL);
+
+	/* Use g_uri_unescape_string on the unescaped form rather
+	 * than passing the raw URI: the properties dialog is
+	 * showing the URI as a human-readable label, and a
+	 * 'file:///home/user/My%20Doc.pdf' is much more useful as
+	 * 'file:///home/user/My Doc.pdf' than as the percent-escaped
+	 * form.  The earlier g_uri_unescape_string used NULL for
+	 * the reserved-chars-allowed argument, which is the
+	 * historical default and is correct here (we want all
+	 * %xx sequences to be decoded). */
+	unescaped = g_uri_unescape_string (uri, NULL);
+	if (unescaped == NULL) {
+		/* g_uri_unescape_string returns NULL on a malformed
+		 * URI (e.g. one with a stray '%' not followed by two
+		 * hex digits).  Fall back to the raw URI so the
+		 * properties dialog still has something to show. */
+		properties->uri = g_strdup (uri);
+	} else {
+		properties->uri = unescaped;
+	}
 
 	return GTK_WIDGET (properties);
 }
