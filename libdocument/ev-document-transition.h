@@ -56,6 +56,13 @@ struct _EvDocumentTransitionInterface
 GType                ev_document_transition_get_type          (void) G_GNUC_CONST;
 gdouble              ev_document_transition_get_page_duration (EvDocumentTransition *document_trans,
 							       gint                  page);
+/**
+ * ev_document_transition_get_effect:
+ * @document_trans: an #EvDocumentTransition
+ * @page: (transfer none): the #EvPage
+ *
+ * Returns: the #EvTransitionEffect used on @page
+ */
 EvTransitionEffect * ev_document_transition_get_effect        (EvDocumentTransition *document_trans,
 							       gint                  page);
 
