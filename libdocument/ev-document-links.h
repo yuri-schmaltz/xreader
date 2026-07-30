@@ -79,6 +79,13 @@ EvMappingList *ev_document_links_get_links           (EvDocumentLinks *document_
 						      EvPage          *page);
 EvLinkDest    *ev_document_links_find_link_dest      (EvDocumentLinks *document_links,
 						      const gchar     *link_name);
+/**
+ * ev_document_links_find_link_page:
+ * @document_links: an #EvDocumentLinks
+ * @link_name: the link name
+ *
+ * Returns: the 0-based page index of the named link, or -1 if not found
+ */
 gint           ev_document_links_find_link_page      (EvDocumentLinks *document_links,
 						      const gchar     *link_name);
 gint           ev_document_links_get_dest_page       (EvDocumentLinks *document_links,
