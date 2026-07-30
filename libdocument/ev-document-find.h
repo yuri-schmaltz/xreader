@@ -60,11 +60,38 @@ struct _EvDocumentFindInterface
 };
 
 GType  ev_document_find_get_type  (void) G_GNUC_CONST;
+
+/**
+ * ev_document_find_find_text:
+ * @document_find: an #EvDocumentFind
+ * @page: (transfer none): an #EvPage
+ * @text: the search text (UTF-8)
+ * @case_sensitive: TRUE for case-sensitive matching
+ *
+ * Searches @page for all occurrences of @text, returning a
+ * #GList of #EvFindRectangle describing each match's
+ * bounding box in page coordinates.  The list is empty (not
+ * NULL) if there are no matches.
+ *
+ * Returns: (element-type EvFindRectangle) (transfer full):
+ *   a list of #EvFindRectangle, one per match
+ */
 GList *ev_document_find_find_text (EvDocumentFind *document_find,
 				   EvPage         *page,
 				   const gchar    *text,
 				   gboolean        case_sensitive);
 
+/**
+ * ev_document_find_check_for_hits:
+ * @document_find: an #EvDocumentFind
+ * @page: (transfer none): an #EvPage
+ * @text: the search text (UTF-8)
+ * @case_sensitive: TRUE for case-sensitive matching
+ *
+ * Returns: the number of matches of @text in @page, without
+ *   computing the per-match bounding boxes.  Use this for
+ *   a 'is there any match?' query that needs to be fast.
+ */
 guint ev_document_find_check_for_hits   (EvDocumentFind *document_find,
                                          EvPage         *page,
                                          const gchar    *text,
