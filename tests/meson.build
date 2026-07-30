@@ -77,3 +77,25 @@ test(
     test_document_factory,
     protocol: 'gtest',
 )
+
+test_image = executable(
+    'test-image',
+    'test-image.c',
+    '../libdocument/ev-image.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+        gdk_pixbuf,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-image"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-image',
+    test_image,
+    protocol: 'gtest',
+)
