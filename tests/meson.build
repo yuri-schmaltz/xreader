@@ -142,3 +142,24 @@ test(
     test_form_field,
     protocol: 'gtest',
 )
+
+test_rect_intersect = executable(
+    'test-rect-intersect',
+    'test-rect-intersect.c',
+    '../libdocument/ev-document.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gobject,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-rect-intersect"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-rect-intersect',
+    test_rect_intersect,
+    protocol: 'gtest',
+)
