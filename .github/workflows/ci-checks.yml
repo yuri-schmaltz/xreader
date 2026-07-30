@@ -479,3 +479,66 @@ jobs:
           name: clang-tidy-log
           path: clang-tidy.log
           if-no-files-found: ignore
+  # Include-what-you-use (IWYU) check.  Detects missing or
+  # wrong #include directives in the C sources.
+  iwyu:
+    name: Include-what-you-use
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            clang \
+            iwyu \
+            python3 \
+            meson \
+            pkg-config \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libsm-dev \
+            libice-dev \
+            libx11-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            libzip-dev \
+            intltool
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: |
+          CC=clang CXX=clang++ meson setup build-iwyu \
+            --buildtype=debug \
+            --werror
+      - name: Generate compile_commands.json
+        run: ln -sf build-iwyu/compile_commands.json compile_commands.json
+      - name: Run iwyu
+        run: |
+          set +e
+          python3 /usr/bin/iwyu_tool.py -p build-iwyu \
+            -X ".*cut-n-paste/smclient.*" \
+            -X ".*cut-n-paste/zoom-control.*" \
+            > iwyu.log 2>&1
+          rc=$?
+          if [ $rc -ne 0 ]; then
+            echo "::warning::iwyu reported issues (see iwyu.log)"
+            head -50 iwyu.log
+          fi
+      - name: Upload iwyu log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iwyu-log
+          path: iwyu.log
+          if-no-files-found: ignore
