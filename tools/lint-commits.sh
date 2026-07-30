@@ -244,6 +244,31 @@ check_one() {
             fi
             ;;
     esac
+
+    # 5. No trailing whitespace in the subject or any body line.
+    if [[ "$subject" =~ [[:space:]]$ ]]; then
+        err "  $sha: subject has trailing whitespace: $subject"
+    fi
+    if [ -n "$rest" ]; then
+        while IFS= read -r line; do
+            if [[ "$line" =~ [[:space:]]$ ]]; then
+                err "  $sha: body line has trailing whitespace: $line"
+            fi
+        done <<< "$rest"
+    fi
+
+    # 6. No tab characters in the subject or body (commits use
+    # spaces; tabs sneak in from copy-pasting from a terminal).
+    if [[ "$subject" == *$'\t'* ]]; then
+        err "  $sha: subject contains a tab character: $subject"
+    fi
+    if [ -n "$rest" ]; then
+        while IFS= read -r line; do
+            if [[ "$line" == *$'\t'* ]]; then
+                err "  $sha: body line contains a tab character: $line"
+            fi
+        done <<< "$rest"
+    fi
 }
 
 err() {
