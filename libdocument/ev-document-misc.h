@@ -39,10 +39,26 @@
 G_BEGIN_DECLS
 
 EV_DEPRECATED
+/**
+ * ev_document_misc_get_thumbnail_frame:
+ * @width: desired thumbnail width
+ * @height: desired thumbnail height
+ * @source: the source #GdkPixbuf
+ *
+ * Returns: (transfer full): a new #GdkPixbuf with a 'page' frame
+ *   drawn around the source pixbuf
+ */
 GdkPixbuf *ev_document_misc_get_thumbnail_frame  (int           width,
 						  int           height,
 						  GdkPixbuf    *source_pixbuf);
 EV_DEPRECATED
+/**
+ * ev_document_misc_get_loading_thumbnail:
+ * @width: width
+ * @height: height
+ *
+ * Returns: (transfer full): a 'Loading...' thumbnail
+ */
 GdkPixbuf *ev_document_misc_get_loading_thumbnail (int      width,
 						   int      height,
 						   gboolean inverted_colors);
