@@ -71,7 +71,20 @@ struct _EvDocumentLayersInterface
 
 GType         ev_document_layers_get_type         (void) G_GNUC_CONST;
 
+/**
+ * ev_document_layers_has_layers:
+ * @document_layers: an #EvDocumentLayers
+ *
+ * Returns: %TRUE if the document has any layers
+ */
 gboolean      ev_document_layers_has_layers       (EvDocumentLayers *document_layers);
+
+/**
+ * ev_document_layers_get_layers:
+ * @document_layers: an #EvDocumentLayers
+ *
+ * Returns: (transfer full): a #GtkTreeModel of all layers
+ */
 GtkTreeModel *ev_document_layers_get_layers       (EvDocumentLayers *document_layers);
 void          ev_document_layers_show_layer       (EvDocumentLayers *document_layers,
 						   EvLayer          *layer);
