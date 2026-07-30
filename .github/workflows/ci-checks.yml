@@ -609,3 +609,38 @@ jobs:
           name: valgrind-logs
           path: /tmp/test-*.log
           if-no-files-found: ignore
+  coverity:
+    name: Coverity scan upload
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl
+      - name: Download Coverity build tool
+        run: |
+          if [ -z "$COVERITY_SCAN_TOKEN" ]; then
+            echo "COVERITY_SCAN_TOKEN not set, skipping"
+            exit 0
+          fi
+          mkdir -p cov-analysis-linux64
+          curl -sSL -o cov.tgz https://scan.coverity.com/download/linux64
+          tar xzf cov.tgz -C cov-analysis-linux64 --strip-components=1 || true
+      - name: Configure
+        run: meson setup build-cov --buildtype=debug --werror
+      - name: Build with Coverity
+        run: |
+          if [ -z "$COVERITY_SCAN_TOKEN" ]; then
+            exit 0
+          fi
+          cov-analysis-linux64/bin/cov-build --dir cov-int meson compile -C build-cov
+      - name: Upload
+        run: |
+          if [ -z "$COVERITY_SCAN_TOKEN" ]; then
+            exit 0
+          fi
+          tar czf cov-int.tgz cov-int
+          curl -sSL -F "project=${{ github.repository }}" -F "token=$COVERITY_SCAN_TOKEN" -F "file=@cov-int.tgz" -F "version=${{ github.sha }}" -F "description=CI build" https://scan.coverity.com/builds
