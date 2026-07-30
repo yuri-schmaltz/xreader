@@ -27,7 +27,7 @@ typedef struct _EvSchedulerJob {
 	GSList        *job_link;
 } EvSchedulerJob;
 
-G_LOCK_DEFINE_STATIC(job_list);
+static GMutex job_list_mutex;
 static GSList *job_list = NULL;
 
 static EvJob *running_job = NULL;
@@ -95,12 +95,12 @@ ev_scheduler_job_list_add (EvSchedulerJob *job)
 {
 	ev_debug_message (DEBUG_JOBS, "%s", EV_GET_TYPE_NAME (job->job));
 
-	G_LOCK (job_list);
+	g_mutex_lock (&job_list_mutex);
 
 	job_list = g_slist_prepend (job_list, job);
 	job->job_link = job_list;
 
-	G_UNLOCK (job_list);
+	g_mutex_unlock (&job_list_mutex);
 }
 
 static void
@@ -108,11 +108,11 @@ ev_scheduler_job_list_remove (EvSchedulerJob *job)
 {
 	ev_debug_message (DEBUG_JOBS, "%s", EV_GET_TYPE_NAME (job->job));
 
-	G_LOCK (job_list);
+	g_mutex_lock (&job_list_mutex);
 
 	job_list = g_slist_delete_link (job_list, job->job_link);
 
-	G_UNLOCK (job_list);
+	g_mutex_unlock (&job_list_mutex);
 }
 
 static void
@@ -276,7 +276,7 @@ ev_job_scheduler_update_job (EvJob         *job,
 
 	ev_debug_message (DEBUG_JOBS, "%s pirority %d", EV_GET_TYPE_NAME (job), priority);
 
-	G_LOCK (job_list);
+	g_mutex_lock (&job_list_mutex);
 
 	for (l = job_list; l; l = l->next) {
 		s_job = (EvSchedulerJob *)l->data;
@@ -287,7 +287,7 @@ ev_job_scheduler_update_job (EvJob         *job,
 		}
 	}
 
-	G_UNLOCK (job_list);
+	g_mutex_unlock (&job_list_mutex);
 
 	if (need_resort) {
 		GList *list;
