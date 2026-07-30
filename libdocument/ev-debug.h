@@ -56,9 +56,9 @@
 #define ev_profiler_start(...) G_STMT_START { } G_STMT_END
 #define ev_profiler_stop(...) G_STMT_START { } G_STMT_END
 #else /* no varargs macros */
-static void ev_debug_message(EvDebugSection section, const gchar *file, gint line, const gchar *function, const gchar *format, ...) {}
-static void ev_profiler_start(EvProfileSection section,	const gchar *format, ...) {}
-static void ev_profiler_stop(EvProfileSection section, const gchar *format, ...) {}
+static void ev_debug_message(EvDebugSection section, const gchar *file, gint line, const gchar *function, const gchar *format, ...) G_GNUC_PRINTF (5, 6) {}
+static void ev_profiler_start(EvProfileSection section,	const gchar *format, ...) G_GNUC_PRINTF (2, 3) {}
+static void ev_profiler_stop(EvProfileSection section, const gchar *format, ...) G_GNUC_PRINTF (2, 3) {}
 #endif
 
 #else /* ENABLE_DEBUG */
