@@ -57,6 +57,13 @@ struct _EvDocumentSecurityInterface
 };
 
 GType    ev_document_security_get_type              (void);
+
+/**
+ * ev_document_security_has_document_security:
+ * @document_security: an #EvDocumentSecurity
+ *
+ * Returns: %TRUE if the document requires a password to open
+ */
 gboolean ev_document_security_has_document_security (EvDocumentSecurity *document_security);
 void     ev_document_security_set_password          (EvDocumentSecurity *document_security,
 						     const char         *password);
