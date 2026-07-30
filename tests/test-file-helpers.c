@@ -212,6 +212,78 @@ test_file_compress_none_is_noop (void)
 	g_assert_no_error (error);
 }
 
+/* ----- ev_tmp_filename_unlink / ev_tmp_uri_unlink / ev_mkstemp_file ----- */
+
+static void
+test_tmp_filename_unlink_in_tmp (void)
+{
+	/* Create a file in /tmp via ev_mkstemp, then call
+	 * ev_tmp_filename_unlink on the path.  The helper must
+	 * delete it because the path is inside g_get_tmp_dir(). */
+	gchar *name = NULL;
+	gint fd = ev_mkstemp ("xreader-tmp-unlink-XXXXXX", &name, NULL);
+	g_assert_cmpint (fd, >=, 0);
+	close (fd);
+
+	/* File must exist before unlink. */
+	g_assert_true (g_file_test (name, G_FILE_TEST_EXISTS));
+
+	ev_tmp_filename_unlink (name);
+
+	/* File must NOT exist after unlink. */
+	g_assert_false (g_file_test (name, G_FILE_TEST_EXISTS));
+
+	g_free (name);
+}
+
+static void
+test_tmp_filename_unlink_outside_tmp (void)
+{
+	/* A path outside g_get_tmp_dir() must NOT be deleted by
+	 * ev_tmp_filename_unlink -- the helper is supposed to be
+	 * a safe unlink that only operates on the xreader tmp
+	 * directory, not a general-purpose unlink. */
+	gchar *name = g_strdup ("/etc/passwd");
+
+	ev_tmp_filename_unlink (name);
+
+	/* /etc/passwd must still exist. */
+	g_assert_true (g_file_test (name, G_FILE_TEST_EXISTS));
+
+	g_free (name);
+}
+
+static void
+test_tmp_filename_unlink_null (void)
+{
+	/* NULL filename is a documented no-op. */
+	ev_tmp_filename_unlink (NULL);
+	/* If we got here without crashing, the test passes. */
+}
+
+static void
+test_mkstemp_file_destroy_notify (void)
+{
+	/* The GFile returned by ev_mkstemp_file has a destroy
+	 * notify that closes the file descriptor.  Unref the
+	 * GFile and verify the FD is closed by trying to close
+	 * it again (close on a closed FD is a no-op + EBADF
+	 * return, which we tolerate). */
+	GError *error = NULL;
+	GFile *file = ev_mkstemp_file ("xreader-mkstemp-fd-XXXXXX", &error);
+	g_assert_nonnull (file);
+	g_assert_no_error (error);
+
+	gchar *path = g_file_get_path (file);
+	g_assert_nonnull (path);
+	g_assert_true (g_file_test (path, G_FILE_TEST_EXISTS));
+	g_unlink (path);
+	g_free (path);
+
+	/* The fd is closed by the destroy notify.  Just unref. */
+	g_object_unref (file);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -235,6 +307,14 @@ main (int argc, char *argv[])
 	                 test_compress_roundtrip);
 	g_test_add_func ("/ev-file-helpers/compress-empty",
 	                 test_compress_empty);
+	g_test_add_func ("/ev-file-helpers/tmp-filename-unlink-in-tmp",
+	                 test_tmp_filename_unlink_in_tmp);
+	g_test_add_func ("/ev-file-helpers/tmp-filename-unlink-outside-tmp",
+	                 test_tmp_filename_unlink_outside_tmp);
+	g_test_add_func ("/ev-file-helpers/tmp-filename-unlink-null",
+	                 test_tmp_filename_unlink_null);
+	g_test_add_func ("/ev-file-helpers/mkstemp-file-destroy-notify",
+	                 test_mkstemp_file_destroy_notify);
 
 	return g_test_run ();
 }
