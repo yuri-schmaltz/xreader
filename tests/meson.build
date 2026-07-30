@@ -121,3 +121,24 @@ test(
     test_page_render,
     protocol: 'gtest',
 )
+
+test_form_field = executable(
+    'test-form-field',
+    'test-form-field.c',
+    '../libdocument/ev-form-field.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-form-field"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-form-field',
+    test_form_field,
+    protocol: 'gtest',
+)
