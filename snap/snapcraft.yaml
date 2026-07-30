@@ -1,0 +1,97 @@
+name: xreader
+base: core22
+adopt-info: xreader
+summary: Document viewer for PDF, DJVU, DVI, XPS, EPUB, and comics
+description: |
+  Xreader is a simple multi-page document viewer. It can display and
+  print PostScript (PS), Encapsulated PostScript (EPS), DJVU, DVI,
+  XPS and Portable Document Format (PDF) files, as well as comic book
+  archive files. When supported by the document, it also allows
+  searching for text, copying text to the clipboard, hypertext navigation
+  and table-of-contents bookmarks.
+
+  This is the yuri-schmaltz/xreader fork with the security hardening,
+  modernizations, and CI improvements made over 70+ self-PRs.
+
+grade: stable
+confinement: strict
+compression: lzo
+
+apps:
+  xreader:
+    command: usr/bin/xreader
+    extensions: [gnome]
+    plugs:
+      - home
+      - network
+      - opengl
+      - desktop
+      - desktop-legacy
+      - wayland
+      - x11
+      - browser-support
+      - network-bind
+      - cups-control
+      - mount-observe
+      - system-observe
+      - gsettings
+      - removable-media
+      - shared-memory
+
+parts:
+  xreader:
+    source: https://github.com/yuri-schmaltz/xreader.git
+    source-tag: v4.7.0
+    plugin: meson
+    meson-parameters:
+      - --prefix=/usr
+    build-packages:
+      - build-essential
+      - intltool
+      - libgtk-3-dev
+      - libpoppler-glib-dev
+      - libgxps-dev
+      - libspectre-dev
+      - libkpathsea-dev
+      - libdjvulibre-dev
+      - libtiff-dev
+      - libsecret-1-dev
+      - libxapp-dev
+      - libsm-dev
+      - libice-dev
+      - libx11-dev
+      - libxml2-dev
+      - libarchive-dev
+      - libgirepository1.0-dev
+      - libwebkit2gtk-4.1-dev
+      - libzip-dev
+      - xapp-symbolic-icons
+      - shared-mime-info
+      - desktop-file-utils
+      - gettext
+      - xvfb
+    stage-packages:
+      - libgtk-3-0
+      - libpoppler-glib0v5
+      - libgxps2
+      - libspectre1
+      - libkpathsea6
+      - libdjvulibre21
+      - libtiff5
+      - libsecret-1-0
+      - libxapp1
+      - libsm6
+      - libice6
+      - libx11-6
+      - libxml2
+      - libarchive13
+      - libwebkit2gtk-4.1-0
+      - libzip4
+      - xapp-symbolic-icons
+      - shared-mime-info
+      - desktop-file-utils
+    override-build: |
+      snapcraftctl build
+      # Generate the desktop file and icon cache
+      desktop-file-install --dir=$CRAFT_PART_INSTALL/usr/share/applications data/xreader.desktop.in
+      gtk-update-icon-cache $CRAFT_PART_INSTALL/usr/share/icons/hicolor
