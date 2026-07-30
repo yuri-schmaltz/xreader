@@ -126,13 +126,13 @@ GQuark           ev_document_error_quark          (void);
 GMutex          *ev_document_get_doc_mutex        (void);
 void             ev_document_doc_mutex_lock       (void);
 void             ev_document_doc_mutex_unlock     (void);
-gboolean         ev_document_doc_mutex_trylock    (void);
+gboolean         ev_document_doc_mutex_trylock    (void) G_GNUC_WARN_UNUSED_RESULT;
 
 /* FontConfig mutex */
 GMutex          *ev_document_get_fc_mutex         (void);
 void             ev_document_fc_mutex_lock        (void);
 void             ev_document_fc_mutex_unlock      (void);
-gboolean         ev_document_fc_mutex_trylock     (void);
+gboolean         ev_document_fc_mutex_trylock     (void) G_GNUC_WARN_UNUSED_RESULT;
 
 EvDocumentInfo  *ev_document_get_info             (EvDocument      *document);
 gboolean         ev_document_get_backend_info     (EvDocument      *document,
