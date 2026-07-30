@@ -83,7 +83,12 @@ ev_keyring_save_password (const gchar  *uri,
 
 	keyring = (flags == G_PASSWORD_SAVE_FOR_SESSION) ? SECRET_COLLECTION_SESSION : NULL;
 	unescaped_uri = g_uri_unescape_string (uri, NULL);
-	name = g_strdup_printf (_("Password for document %s"), unescaped_uri);
+	/* g_uri_unescape_string returns NULL on a malformed URI
+	 * (a '%' not followed by two hex digits).  Fall back to
+	 * the raw URI so the keyring 'Password for document X'
+	 * label is always populated. */
+	name = g_strdup_printf (_("Password for document %s"),
+	                        unescaped_uri ? unescaped_uri : uri);
 	g_free (unescaped_uri);
 	
 	retval = secret_password_store_sync (EV_DOCUMENT_PASSWORD_SCHEMA, keyring,
