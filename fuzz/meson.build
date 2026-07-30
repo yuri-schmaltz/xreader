@@ -41,4 +41,21 @@ if get_option('fuzz').enabled()
     link_args: fuzz_link_args,
     build_by_default: false,
   )
+
+  # Complements fuzz-document-load: same input, but writes the
+  # bytes to 14 different file extensions so the MIME dispatcher
+  # is forced to take the extension-based fast path for every
+  # backend (poppler, djvu, dvi, gxps, epub, tiff, comics, odf,
+  # ...).  See fuzz/fuzz-document-load-all.c for the full list.
+  executable(
+    'fuzz-document-load-all',
+    'fuzz-document-load-all.c',
+    include_directories: include_dirs,
+    dependencies: fuzz_deps,
+    c_args: [
+      '-DG_LOG_DOMAIN="fuzz-document-load-all"',
+    ],
+    link_args: fuzz_link_args,
+    build_by_default: false,
+  )
 endif
