@@ -88,6 +88,16 @@ struct _EvDocumentAnnotationsInterface
 };
 
 GType          ev_document_annotations_get_type             (void) G_GNUC_CONST;
+
+/**
+ * ev_document_annotations_get_annotations:
+ * @document_annots: an #EvDocumentAnnotations
+ * @page: (transfer none): the #EvPage to look up
+ *
+ * Returns: (transfer full) (element-type EvAnnotation): the list
+ *   of #EvAnnotation on @page, or NULL if the document has no
+ *   annotations on this page
+ */
 EvMappingList *ev_document_annotations_get_annotations      (EvDocumentAnnotations *document_annots,
 							     EvPage                *page);
 gboolean       ev_document_annotations_document_is_modified (EvDocumentAnnotations *document_annots);

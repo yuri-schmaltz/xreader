@@ -51,7 +51,21 @@ struct _EvDocumentAttachmentsInterface
 
 GType     ev_document_attachments_get_type        (void) G_GNUC_CONST;
 
+/**
+ * ev_document_attachments_has_attachments:
+ * @document_attachments: an #EvDocumentAttachments
+ *
+ * Returns: %TRUE if the document has at least one attachment
+ */
 gboolean  ev_document_attachments_has_attachments (EvDocumentAttachments *document_attachments);
+
+/**
+ * ev_document_attachments_get_attachments:
+ * @document_attachments: an #EvDocumentAttachments
+ *
+ * Returns: (transfer full) (element-type EvAttachment): the list
+ *   of all attachments in the document
+ */
 GList    *ev_document_attachments_get_attachments (EvDocumentAttachments *document_attachments);
 
 G_END_DECLS

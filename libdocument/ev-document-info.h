@@ -131,6 +131,13 @@ struct _EvDocumentInfo
 };
 
 GType           ev_document_info_get_type (void) G_GNUC_CONST;
+
+/**
+ * ev_document_info_copy:
+ * @info: (transfer none): an #EvDocumentInfo
+ *
+ * Returns: (transfer full): a deep copy of @info
+ */
 EvDocumentInfo *ev_document_info_copy     (EvDocumentInfo *info);
 void            ev_document_info_free     (EvDocumentInfo *info);
 
@@ -142,6 +149,12 @@ struct _EvDocumentLicense {
 	gchar *web_statement;
 };
 GType              ev_document_license_get_type          (void) G_GNUC_CONST;
+
+/**
+ * ev_document_license_new:
+ *
+ * Returns: (transfer full): a new empty #EvDocumentLicense
+ */
 EvDocumentLicense *ev_document_license_new               (void);
 EvDocumentLicense *ev_document_license_copy              (EvDocumentLicense *license);
 void               ev_document_license_free              (EvDocumentLicense *license);
