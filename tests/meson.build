@@ -99,3 +99,25 @@ test(
     test_image,
     protocol: 'gtest',
 )
+
+test_page_render = executable(
+    'test-page-render',
+    'test-page-render.c',
+    '../libdocument/ev-page.c',
+    '../libdocument/ev-render-context.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-page-render"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-page-render',
+    test_page_render,
+    protocol: 'gtest',
+)
