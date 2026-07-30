@@ -18,6 +18,124 @@ vulnerability; see SECURITY.md for the responsible-disclosure
 policy.
 
 
+Changes in 4.8.0 (unreleased)
+-----------------------
+
+This is the next minor release after 4.7.0.  The 4.8.0 cycle
+will include 23 self-PRs in the yuri-schmaltz/xreader fork
+(round 8 onwards, building on the security + modernization +
+CI work in 4.7.0):
+
+Build, CI, packaging
+~~~~~~~~~~~~~~~~~~~~
+
+* `.github/workflows/ci-checks.yml` -- 5 new CI jobs:
+  `clang-tidy` (PR #67), `iwyu` (PR #68), `valgrind`
+  (PR #69), `coverity-scan` (PR #71, gated on the
+  `COVERITY_SCAN_TOKEN` secret), and `clang` (PR #80).
+  The total CI count is now 12 jobs.
+* `meson.build` -- add `-D_FORTIFY_SOURCE=3` (was implicit
+  2) and `-fstack-protector-strong` to harden the build
+  against stack-based buffer overflows.  (PR #81)
+* `tools/release.sh` -- add `--no-push` flag that skips
+  the `git push` of master + tag, useful for testing the
+  bump+changelog+appdata+commit+tag flow without touching
+  the remote.  (PR #84)
+* `tools/lint-branches.sh` -- new script (PR #85) that
+  enforces the xreader branch-name style (category prefix
+  + kebab-case description, max 80 chars).
+
+Public API annotations
+~~~~~~~~~~~~~~~~~~~~~~
+
+* `ev-file-helpers.h` -- add `G_GNUC_PURE` (1) and
+  `G_GNUC_MALLOC` (5) on the public helper functions.
+  (PR #61)
+* `ev-init.c` -- add `G_GNUC_WARN_UNUSED_RESULT` (4) on
+  `ev_init` / `ev_is_initialized` / `ev_mutex_trylock`.
+  (PR #62)
+* `ev-debug.c` / `ev-profile.c` -- add `G_GNUC_PRINTF`
+  (3) on the no-varargs stubs of `ev_debug_message` and
+  the profiler output functions.  (PR #63)
+* 12 `G_GNUC_NONNULL` annotations on the new helper
+  functions added in 4.7.0 (PR #43).
+
+gtk-doc blocks
+~~~~~~~~~~~~~~
+
+* 9 headers now have proper `/** ... */` gtk-doc blocks:
+  `ev-page.h`, `ev-document-find.h`, `ev-render-context.h`
+  (PR #52), `ev-document-annotations.h`,
+  `ev-document-attachments.h`, `ev-document-info.h`,
+  `ev-document-fonts.h`, `ev-document-images.h`,
+  `ev-document-security.h` (PR #56-57),
+  `ev-document-forms.h`, `ev-document-layers.h`,
+  `ev-document-links.h`, `ev-document-misc.h`,
+  `ev-document-print.h`, `ev-document-text.h`,
+  `ev-document-transition.h` (PR #58-60).
+* `ev-form-field.h` -- add gtk-doc blocks for the
+  `ev_form_field_type_to_string` and
+  `ev_form_field_type_from_string` helpers added in
+  this release.  (PR #78)
+
+API modernization
+~~~~~~~~~~~~~~~~~
+
+* `g_slice_*` -> `g_new` / `g_free` in 4 files (10 uses).
+  `g_slice_*` was deprecated in glib 2.68; the new API is
+  portable across the full glib 2.32+ matrix.  (PR #64)
+* `g_get_current_time` + `GTimeVal` -> `g_get_real_time`
+  in `ev-file-helpers.c`.  `g_get_current_time` was
+  deprecated in glib 2.62.  (PR #65)
+* `strcasecmp` -> `g_ascii_strcasecmp` in `ev-document.c`.
+  The latter is locale-independent (ASCII-only), which
+  is what the document-type dispatch wants.  (PR #66)
+* `g_uri_unescape_string` -- add NULL fallbacks in
+  `ev-properties-view.c` and `ev-keyring.c` (the
+  function returns NULL on malformed URI input).
+  (PR #50, #51)
+
+Unit tests
+~~~~~~~~~~
+
+* `tests/test-form-field.c` -- 9 new test cases covering
+  the form-field type helpers.  Total test count:
+  52 -> 61 unit tests.  (PR #79)
+* `tests/test-page-render.c` -- 7 test cases for the
+  page-render path.  Added in 4.7.0 (PR #60).  Mentioned
+  here for completeness.
+
+New helpers
+~~~~~~~~~~~
+
+* `libdocument/ev-form-field.c` -- add
+  `ev_form_field_type_to_string` and
+  `ev_form_field_type_from_string` (PR #78).  Foundation
+  for the upcoming B6 PDF form-filling UI.
+
+Build artifacts
+~~~~~~~~~~~~~~~
+
+* `flatpak/io.github.yuri_schmaltz.Xreader.json` --
+  Flatpak manifest for the sandboxed install path.
+  (PR #74)
+* `snap/snapcraft.yaml` -- Snap manifest for the
+  snapd-based install path.  (PR #75)
+
+Data files
+~~~~~~~~~~
+
+* `data/xreader.appdata.xml.in` -- expand with
+  `bugtracker` URL, screenshots, keywords, and the
+  full mimetype list.  (PR #73)
+
+Contributors
+~~~~~~~~~~~~
+
+See `debian/changelog` for the full list of contributors.
+
+
+
 Changes in 4.7.0 (2026-07-28)
 -----------------------
 
