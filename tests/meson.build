@@ -211,3 +211,28 @@ test(
     test_reopen_stack,
     protocol: 'gtest',
 )
+
+test_tabbed_integration = executable(
+    'test-tabbed-integration',
+    'test-tabbed-integration.c',
+    '../shell/ev-tabbed-window.c',
+    '../shell/ev-tab.c',
+    '../shell/ev-tab-manager.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gobject,
+        gio,
+        gtk,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-tabbed-integration"',
+        '-DXREADER_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-tabbed-integration',
+    test_tabbed_integration,
+    protocol: 'gtest',
+)

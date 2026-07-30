@@ -40,6 +40,7 @@
 #include "ev-application.h"
 #include "ev-file-helpers.h"
 #include "ev-stock-icons.h"
+#include "ev-tabbed-window.h"
 
 #ifdef ENABLE_DBUS
 #include "ev-gdbus-generated.h"
@@ -681,13 +682,13 @@ _ev_application_open_uri_at_dest (EvApplication  *application,
                                   const gchar    *search_string,
                                   guint           timestamp)
 {
-    EvWindow *ev_window;
+    GtkWidget *new_window;
 
-    ev_window = ev_application_get_empty_window (application, screen);
-    if (!ev_window)
-        ev_window = EV_WINDOW (ev_window_new ());
+    new_window = ev_application_get_empty_window (application, screen);
+    if (!new_window)
+        new_window = ev_application_create_window (application);
 
-    ev_application_open_uri_in_window (application, uri, ev_window,
+    ev_application_open_uri_in_window (application, uri, EV_WINDOW (new_window),
                                        screen, dest, mode,
                                        search_string,
                                        timestamp);
@@ -743,7 +744,7 @@ ev_application_open_window (EvApplication *application,
                             GdkScreen     *screen,
                             guint32        timestamp)
 {
-    GtkWidget *new_window = ev_window_new ();
+    GtkWidget *new_window = ev_application_create_window (application);
 
     if (screen) {
         ev_stock_icons_set_screen (screen);
@@ -1229,3 +1230,38 @@ ev_application_get_dot_dir (EvApplication *application,
     return application->dot_dir;
 }
 
+
+/**
+ * ev_application_create_window:
+ * @application: an #EvApplication
+ *
+ * Creates a new top-level window.  When the 'tabbed-mode'
+ * GSettings key is true, the new window is an #EvTabbedWindow
+ * (which hosts multiple documents in tabs); otherwise it
+ * is a legacy #EvWindow (single document per window).
+ *
+ * This is the single point where the tabbed-mode choice
+ * is reflected.  All call sites that previously did
+ * `ev_window_new()` should be updated to call this
+ * helper instead.
+ *
+ * Returns: (transfer full): a new top-level window
+ */
+GtkWidget *
+ev_application_create_window (EvApplication *application)
+{
+	GSettings *settings;
+	gboolean   tabbed;
+
+	g_return_val_if_fail (EV_IS_APPLICATION (application), NULL);
+
+	settings = g_settings_new ("org.x.reader");
+	tabbed = g_settings_get_boolean (settings, "tabbed-mode");
+	g_object_unref (settings);
+
+	if (tabbed) {
+		return ev_tabbed_window_new (GTK_APPLICATION (application));
+	}
+
+	return ev_window_new ();
+}
