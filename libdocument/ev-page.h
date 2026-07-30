@@ -56,6 +56,24 @@ struct _EvPageClass {
 
 GType   ev_page_get_type (void) G_GNUC_CONST;
 
+/**
+ * ev_page_new:
+ * @index: the page index (0-based)
+ *
+ * Creates a new #EvPage wrapping a backend-specific page handle
+ * (EvBackendPage is a gpointer, typed by the backend that
+ * created it -- see ev-poppler-page.c for the poppler
+ * implementation, ev-dvi-page.c for the dvi implementation, ...).
+ * The #EvPage is a thin GObject wrapper that adds refcounting +
+ * a destroy notify so the backend can free its page handle when
+ * the #EvPage is unreferenced.
+ *
+ * The 0-based @index is the position of the page within the
+ * document, used by the rendering layer to address the page
+ * regardless of which backend is in use.
+ *
+ * Returns: (transfer full): a new #EvPage
+ */
 EvPage *ev_page_new      (gint index);
 
 G_END_DECLS
