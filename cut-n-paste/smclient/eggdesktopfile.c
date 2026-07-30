@@ -725,6 +725,21 @@ parse_exec (EggDesktopFile  *desktop_file,
   if (!exec)
     return NULL;
 
+  /* Defensive: a hostile .desktop file can have an Exec= line
+   * of arbitrary length.  Cap it to a sensible maximum (32 KB)
+   * so a single malformed .desktop file can't exhaust memory
+   * in the launcher or slow down the build of the command
+   * string to O(n^2) in the percent-substitution path below. */
+  if (strlen (exec) > EGG_DESKTOP_FILE_MAX_EXEC_LENGTH)
+    {
+      g_free (exec);
+      g_set_error (error, G_KEY_FILE_ERROR,
+		   G_KEY_FILE_ERROR_INVALID_VALUE,
+		   "Exec= line is %zu bytes; max is %d",
+		   strlen (exec), EGG_DESKTOP_FILE_MAX_EXEC_LENGTH);
+      return NULL;
+    }
+
   /* Build the command */
   gs = g_string_new (NULL);
   escape = single_quot = double_quot = FALSE;
