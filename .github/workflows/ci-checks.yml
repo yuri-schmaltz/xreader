@@ -398,3 +398,84 @@ jobs:
           name: coverage-report
           path: coverage-html/
           if-no-files-found: warn
+  # Static analysis with clang-tidy.  Catches a different
+  # class of issues than cppcheck (PR #41): clang-tidy has
+  # checks for performance, modernization, and bugprone
+  # patterns that cppcheck does not.  Run on the same scope
+  # as the cppcheck job.
+  clang-tidy:
+    name: clang-tidy static analysis
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            clang \
+            clang-tidy \
+            meson \
+            pkg-config \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libsm-dev \
+            libice-dev \
+            libx11-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            libzip-dev \
+            intltool
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: |
+          CC=clang CXX=clang++ meson setup build-tidy \
+            --buildtype=debug \
+            --werror
+      - name: Generate compile_commands.json
+        run: |
+          # clang-tidy needs a compile_commands.json with the
+          # exact command lines.  meson generates this in the
+          # build directory automatically; symlink it to the
+          # project root for clang-tidy's default lookup.
+          ln -sf build-tidy/compile_commands.json compile_commands.json
+      - name: Run clang-tidy
+        run: |
+          set -e
+          # Run clang-tidy on the same scope as the cppcheck
+          # job (libdocument + libview + shell + backend +
+          # cut-n-paste + thumbnailer + previewer).  The
+          # default checks are: bugprone-, cert-, clang-analyzer-*,
+          # performance-, portability-, readability- (the
+          # last 3 are too noisy for legacy C, so we use a
+          # tighter set).
+          clang-tidy --quiet --p=build-tidy \
+            -checks="bugprone-*,cert-*,clang-analyzer-*,performance-*" \
+            -header-filter=".*\\.h$" \
+            $(find libdocument libview shell backend cut-n-paste thumbnailer previewer \
+                -name '*.c' -not -path '*/smclient/*' \
+                -not -path '*/zoom-control/*') \
+            2>&1 | tee clang-tidy.log | head -100
+          # If clang-tidy found any issues, the tee output
+          # shows the first 100; the full log is in the
+          # workflow artifact.
+          if grep -qE "warning:|error:" clang-tidy.log; then
+            echo "::warning::clang-tidy reported issues (see clang-tidy.log)"
+          fi
+      - name: Upload clang-tidy log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-tidy-log
+          path: clang-tidy.log
+          if-no-files-found: ignore
