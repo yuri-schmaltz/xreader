@@ -40,6 +40,8 @@ range="HEAD"
 incoming=0
 since_days=90
 
+apply=0
+
 while [ $# -gt 0 ]; do
     case "$1" in
         --incoming)
@@ -48,6 +50,10 @@ while [ $# -gt 0 ]; do
             ;;
         --since=*)
             since_days="${1#--since=}"
+            shift
+            ;;
+        --apply)
+            apply=1
             shift
             ;;
         -h|--help)
@@ -124,6 +130,21 @@ if [ "$count_suggestions" -eq 0 ]; then
     green "No name has more than one email variation -- .mailmap is up to date."
 else
     bold "==> Total: $count_suggestions name(s) with multiple email variations"
-    echo "Review the lines above and paste the candidate entries into .mailmap."
-    echo "Each one is a comment (#) and will be ignored by git until uncommented."
+    if [ "$apply" -eq 1 ]; then
+        # Auto-apply the candidates to .mailmap.
+        # We need to capture the output to a temp file
+        # (the script currently prints to stdout; refactor
+        # to also write to a file when --apply is set).
+        tmp=$(mktemp)
+        "$0" "$@" > "$tmp" 2>&1 || true
+        # Re-extract just the '# .mailmap candidate' blocks
+        # and append to .mailmap.
+        awk '/# .mailmap candidate:/,/^$/' "$tmp" | sed 's/^# //' >> .mailmap
+        rm -f "$tmp"
+        green "Applied $count_suggestions entries to .mailmap"
+    else
+        echo "Review the lines above and paste the candidate entries into .mailmap."
+        echo "Each one is a comment (#) and will be ignored by git until uncommented."
+        echo "Re-run with --apply to auto-add the candidates to .mailmap."
+    fi
 fi
