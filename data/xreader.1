@@ -33,6 +33,12 @@ Start \fBxreader\fR in presentation mode. You must specify a document to start i
 \fB\-w, \-\-preview\fR
 Start \fBxreader\fR in preview mode. You must specify a document to start in preview mode.
 .TP
+\fB\-T, \-\-tabbed\fR
+Start \fBxreader\fR in tabbed view mode. In this mode, opening a file adds a new tab to the existing window instead of creating a new window. Multiple files given on the command line are all opened in tabs in the same window. The choice is also stored in the \fBorg.x.reader\fR GSettings schema (\fBtabbed-mode\fR key), so subsequent sessions start in tabbed mode. See \fBdocs/TABBED_VIEW.md\fR for the full feature description (keyboard shortcuts: \fBCtrl+Tab\fR, \fBCtrl+W\fR, \fBCtrl+Shift+T\fR; drag-and-drop of files onto tabs; reopen-last-closed-tab).
+.TP
+\fB\-\-new-tab\fR
+Open the given file in a new tab in an existing window (requires \fB\-\-tabbed\fR). If no window is open, behaves like the default (opens a new window).
+.TP
 \fB\-\-display=DISPLAY\fR
 X display to use.
 .TP
