@@ -46,8 +46,12 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
     Multi-month -- Planned.
   - **C2** GTK 4 port -- 4.16.0 -- Multi-month -- Planned
     (depends on C1 + B1).
-  - **C3** Tabbed view (same as B3) -- 4.14.0 -- Multi-month
-    -- Planned.
+  - **C3** Tabbed view -- 4.8.0 (foundation) / 4.9.0 (full
+    integration) -- Multi-month -- **IN PROGRESS** (PRs #96-#102
+    in 4.8.0: EvTab + EvTabManager + EvTabbedWindow + CLI flag
+    + GSettings + keyboard shortcuts + drag-and-drop; PRs in
+    4.9.0 will add the shared chrome + page navigation +
+    session save/restore).
   - **C4** Wayland-native window management -- 4.13.0 --
     Multi-month -- Planned (depends on GTK 4 partial).
   - **C5** XApp sidebar / libxapp integration -- 4.12.0

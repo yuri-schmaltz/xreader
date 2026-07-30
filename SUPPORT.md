@@ -99,10 +99,18 @@ use) to fill out forms.
 
 ### Q: Does Xreader have a tabbed view?
 
-Not yet.  The C3 item in the roadmap (4.14.0 target) is
-a tabbed view, similar to Firefox's.  The work is
-multi-PR and depends on the GAction migration (B1)
-finishing first.
+Yes, as of 4.8.0!  Enable it via `gsettings set
+org.x.reader tabbed-mode true` or pass `xreader --tabbed`
+on the command line.  See `docs/TABBED_VIEW.md` for the
+full feature description (keyboard shortcuts, drag-and-
+drop, reopen-last-closed).
+
+The 4.8.0 release has the foundation: a working
+notebook, keyboard shortcuts, drag-and-drop, and a
+reopen-closed-tab stack.  The 4.9.0 release will
+add the shared chrome (menubar/toolbar/sidebar
+shared across all tabs), page navigation on the
+active tab, and session save/restore.
 
 ### Q: How do I report a security vulnerability?
 

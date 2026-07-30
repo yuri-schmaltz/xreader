@@ -22,9 +22,44 @@ Changes in 4.8.0 (unreleased)
 -----------------------
 
 This is the next minor release after 4.7.0.  The 4.8.0 cycle
-will include 23 self-PRs in the yuri-schmaltz/xreader fork
-(round 8 onwards, building on the security + modernization +
+will include 30 self-PRs in the yuri-schmaltz/xreader fork
+(rounds 8-13, building on the security + modernization +
 CI work in 4.7.0):
+
+New feature: tabbed view (C3)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `shell/ev-tab.{c,h}` -- new EvTab class: per-tab state
+  container (location, page, modified, title, tooltip).
+  (PR #96)
+* `shell/ev-tab-manager.{c,h}` -- new EvTabManager class:
+  owns the list of tabs + tracks the active one, emits
+  4 signals (tab-added, tab-removed, active-changed,
+  tab-reordered).  (PR #97)
+* `shell/ev-tabbed-window.{c,h}` -- new EvTabbedWindow class
+  (GtkApplicationWindow subclass): the tabbed view top-level
+  window.  Composes EvTabManager + GtkNotebook, hides the
+  tab bar when there's only 1 tab.  (PR #99)
+* `data/org.x.reader.gschema.xml` -- new 'tabbed-mode' GSettings
+  key (default: false).  `shell/main.c` -- new `--tabbed` / `-T`
+  CLI flag.  (PR #100)
+* `shell/ev-tabbed-window.c` -- keyboard shortcuts via
+  GtkEventControllerKey: Ctrl+Tab / Ctrl+Shift+Tab / Ctrl+PgDn /
+  Ctrl+PgUp (tab switching), Ctrl+W (close tab), Ctrl+Shift+T
+  (reopen last closed).  `shell/ev-tab-manager.{c,h}` -- the
+  reopen stack is bounded (max 10).  (PR #101)
+* `shell/ev-tabbed-window.c` -- drag-and-drop: each tab and
+  the empty-state label are drop targets for files.  Uses
+  gtk_drag_dest_* (GTK 3.16+).  (PR #102)
+* `docs/TABBED_VIEW.md` -- user + developer documentation.
+  `ROADMAP.md` -- C3 marked as IN PROGRESS.  (PR #103)
+
+The 4.9.0 cycle will complete the C3 feature with shared
+chrome (menubar/toolbar/sidebar per tab), page navigation
+on the active tab, and session save/restore.
+
+Build, CI, packaging
+~~~~~~~~~~~~~~~~~~~~
 
 Build, CI, packaging
 ~~~~~~~~~~~~~~~~~~~~
