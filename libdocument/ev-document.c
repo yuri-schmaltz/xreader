@@ -918,6 +918,23 @@ ev_rectangle_new (void)
 	return g_new0 (EvRectangle, 1);
 }
 
+
+gboolean
+ev_rectangle_intersect (const EvRectangle *a,
+                        const EvRectangle *b)
+{
+	g_return_val_if_fail (a != NULL, FALSE);
+	g_return_val_if_fail (b != NULL, FALSE);
+
+	/* Boxes that don't overlap on either axis don't overlap. */
+	if (a->x2 < b->x1 || b->x2 < a->x1)
+		return FALSE;
+	if (a->y2 < b->y1 || b->y2 < a->y1)
+		return FALSE;
+
+	return TRUE;
+}
+
 EvRectangle *
 ev_rectangle_copy (EvRectangle *rectangle)
 {
