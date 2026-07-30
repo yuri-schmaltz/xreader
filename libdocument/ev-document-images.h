@@ -55,6 +55,15 @@ struct _EvDocumentImagesInterface {
 };
 
 GType          ev_document_images_get_type          (void) G_GNUC_CONST;
+
+/**
+ * ev_document_images_get_image_mapping:
+ * @document_images: an #EvDocumentImages
+ * @page: (transfer none): the #EvPage to look up
+ *
+ * Returns: (transfer full) (element-type EvImage): the list of
+ *   #EvImage objects on @page, with their bounding boxes
+ */
 EvMappingList *ev_document_images_get_image_mapping (EvDocumentImages *document_images,
 						     EvPage           *page);
 GdkPixbuf     *ev_document_images_get_image         (EvDocumentImages *document_images,
