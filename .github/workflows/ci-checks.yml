@@ -310,3 +310,24 @@ jobs:
             --suppress=unusedFunction \
             -I libdocument -I libview -I shell -I backend -I cut-n-paste -I thumbnailer -I previewer \
             libdocument libview shell backend cut-n-paste thumbnailer previewer
+  # Source-style checks: trailing whitespace, CRLF, BOMs, tabs in
+  # non-source files, clang-format.  Runs tools/check-source.sh
+  # (added in PR #17, made runnable in this PR) on every PR.
+  # Catches the 'cosmetic' regressions that the warnings /
+  # sanitizers jobs don't (and shouldn't) flag.
+  source-style:
+    name: Source style (check-source.sh)
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            clang-format \
+            shellcheck
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run check-source.sh
+        run: ./tools/check-source.sh
