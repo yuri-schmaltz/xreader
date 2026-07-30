@@ -121,6 +121,10 @@ ev_application_load_session (EvApplication *application)
 {
     GKeyFile *state_file;
     gchar    *uri;
+    gchar    *uris;
+    gchar   **uri_list;
+    guint     active_index = 0;
+    gint      i;
 
 #ifdef WITH_SMCLIENT
     if (egg_sm_client_is_resumed (application->smclient)) {
@@ -131,15 +135,51 @@ ev_application_load_session (EvApplication *application)
 #endif /* WITH_SMCLIENT */
         return FALSE;
 
-    uri = g_key_file_get_string (state_file, "Xreader", "uri", NULL);
-    if (!uri)
-        return FALSE;
+    /* New format (4.8.0+): 'uris' (CSV) + 'active-index' (uint).
+     * Old format (4.7.0): single 'uri'.  Read both, prefer the new. */
+    uris = g_key_file_get_string (state_file, "Xreader", "uris", NULL);
+    if (uris) {
+        uri_list = g_strsplit (uris, ",", 0);
+        g_free (uris);
+        if (g_key_file_has_key (state_file, "Xreader", "active-index", NULL))
+            active_index = g_key_file_get_integer (
+                state_file, "Xreader", "active-index", NULL);
+    } else {
+        uri = g_key_file_get_string (state_file, "Xreader", "uri", NULL);
+        if (!uri) {
+            g_key_file_free (state_file);
+            return FALSE;
+        }
+        uri_list = g_new0 (gchar *, 2);
+        uri_list[0] = uri;
+    }
 
-    ev_application_open_uri_at_dest (application, uri,
-                                     gdk_screen_get_default (),
-                                     NULL, 0, NULL,
-                                     GDK_CURRENT_TIME);
-    g_free (uri);
+    /* Create the window once (so all tabs go into the same window
+     * in tabbed mode).  In single-window mode, only the first
+     * URI is opened (the rest are ignored, matching the 4.7.0
+     * behavior). */
+    GSettings *settings = g_settings_new ("org.x.reader");
+    gboolean   tabbed = g_settings_get_boolean (settings, "tabbed-mode");
+    g_object_unref (settings);
+
+    if (tabbed && g_strv_length (uri_list) > 0) {
+        GtkWidget *window = ev_application_create_window (application);
+        for (i = 0; uri_list[i] != NULL; i++) {
+            GFile *file = g_file_new_for_uri (uri_list[i]);
+            ev_tabbed_window_open_file (EV_TABBED_WINDOW (window), file, NULL);
+            g_object_unref (file);
+        }
+        gtk_widget_show (window);
+        /* TODO 4.9.0: focus the tab at active_index */
+    } else {
+        /* Legacy path: open the first URI. */
+        ev_application_open_uri_at_dest (application, uri_list[0],
+                                         gdk_screen_get_default (),
+                                         NULL, 0, NULL,
+                                         GDK_CURRENT_TIME);
+    }
+
+    g_strfreev (uri_list);
     g_key_file_free (state_file);
 
     return TRUE;
@@ -152,10 +192,52 @@ smclient_save_state_cb (EggSMClient   *client,
                         GKeyFile      *state_file,
                         EvApplication *application)
 {
-    if (!application->uri)
-        return;
+    /* New format (4.8.0+): 'uris' (CSV) + 'active-index' (uint)
+     * covers the tabbed view.  Old format (4.7.0): single 'uri'.
+     * Write both: the new fields when the application has tabbed
+     * windows, the old field as a fallback for the single-window
+     * case. */
+    if (application->uri) {
+        g_key_file_set_string (state_file, "Xreader", "uri", application->uri);
+    }
 
-    g_key_file_set_string (state_file, "Xreader", "uri", application->uri);
+    /* Save the tabbed view state (if any tabbed windows are open). */
+    GList *windows = gtk_application_get_windows (GTK_APPLICATION (application));
+    GList *l;
+    for (l = windows; l != NULL; l = l->next) {
+        if (!EV_IS_TABBED_WINDOW (l->data))
+            continue;
+
+        EvTabbedWindow *tw = EV_TABBED_WINDOW (l->data);
+        EvTabManager  *mgr = ev_tabbed_window_get_tab_manager (tw);
+        guint n = ev_tab_manager_get_n_tabs (mgr);
+        if (n == 0)
+            continue;
+
+        GString *uris_csv = g_string_new ("");
+        guint i;
+        for (i = 0; i < n; i++) {
+            EvTab *tab = ev_tab_manager_get_tab (mgr, i);
+            GFile *loc = ev_tab_get_location (tab);
+            if (loc) {
+                gchar *uri_str = g_file_get_uri (loc);
+                if (i > 0)
+                    g_string_append_c (uris_csv, ',');
+                g_string_append (uris_csv, uri_str);
+                g_free (uri_str);
+                g_object_unref (loc);
+            }
+        }
+        if (uris_csv->len > 0) {
+            g_key_file_set_string (state_file, "Xreader", "uris",
+                                  uris_csv->str);
+            g_key_file_set_integer (state_file, "Xreader", "active-index",
+                                    (gint) ev_tab_manager_get_tab_index (
+                                        mgr, ev_tab_manager_get_active (mgr)));
+        }
+        g_string_free (uris_csv, TRUE);
+        break;  /* Only the first tabbed window is restored. */
+    }
 }
 
 static void
