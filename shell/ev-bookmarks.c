@@ -69,7 +69,7 @@ ev_bookmark_free (EvBookmark *bm)
                 return;
 
         g_free (bm->title);
-        g_slice_free (EvBookmark, bm);
+        g_free(bm);
 }
 
 static void
@@ -140,7 +140,7 @@ ev_bookmarks_constructed (GObject *object)
 
         g_variant_iter_init (&iter, bm_list);
         while ((child = g_variant_iter_next_value (&iter))) {
-                EvBookmark *bm = g_slice_new (EvBookmark);
+                EvBookmark *bm = g_new(EvBookmark, 1);
 
                 g_variant_get (child, "(us)", &bm->page, &bm->title);
                 if (bm->title && strlen (bm->title) > 0)
@@ -235,7 +235,7 @@ ev_bookmarks_add (EvBookmarks *bookmarks,
         if (g_list_find_custom (bookmarks->items, bookmark, (GCompareFunc)ev_bookmark_compare))
                 return;
 
-        bm = g_slice_new (EvBookmark);
+        bm = g_new(EvBookmark, 1);
         *bm = *bookmark;
         bookmarks->items = g_list_append (bookmarks->items, bm);
         g_signal_emit (bookmarks, signals[CHANGED], 0);
