@@ -75,6 +75,12 @@ void              ev_application_screensaver_disable    (EvApplication   *applic
 const gchar *     ev_application_get_dot_dir            (EvApplication   *application,
                                                          gboolean         create);
 
+/* Create a new top-level window.  Returns an #EvTabbedWindow
+ * when the 'tabbed-mode' GSettings key is true, otherwise an
+ * #EvWindow.  Single point where the tabbed-mode choice is
+ * reflected.  See the C3 tabbed view feature. */
+GtkWidget *       ev_application_create_window          (EvApplication   *application);
+
 extern gchar **supported_mimetypes;
 
 G_END_DECLS
