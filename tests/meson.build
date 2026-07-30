@@ -163,3 +163,27 @@ test(
     test_rect_intersect,
     protocol: 'gtest',
 )
+
+test_tab_manager = executable(
+    'test-tab-manager',
+    'test-tab-manager.c',
+    '../shell/ev-tab.c',
+    '../shell/ev-tab-manager.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gobject,
+        gio,
+        gtk,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-tab-manager"',
+        '-DXREADER_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-tab-manager',
+    test_tab_manager,
+    protocol: 'gtest',
+)
