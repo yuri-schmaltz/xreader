@@ -39,6 +39,12 @@ struct _EvTabbedWindowPrivate
 
 G_DEFINE_TYPE_WITH_PRIVATE (EvTabbedWindow, ev_tabbed_window, GTK_TYPE_APPLICATION_WINDOW)
 
+static gboolean on_key_pressed (GtkEventControllerKey *controller,
+                                guint                  keyval,
+                                guint                  keycode,
+                                GdkModifierType        state,
+                                gpointer               user_data);
+
 static void
 update_tab_bar_visibility (EvTabbedWindow *window)
 {
@@ -320,6 +326,60 @@ ev_tabbed_window_init (EvTabbedWindow *window)
 	update_empty_state (window);
 	gtk_window_set_title (GTK_WINDOW (window), _("Xreader"));
 	gtk_window_set_default_size (GTK_WINDOW (window), 800, 600);
+
+	/* Keyboard shortcuts via a GtkEventControllerKey.  Production-ready
+	 * approach (works with GTK 3.24+). */
+	GtkEventController *key_controller = gtk_event_controller_key_new (GTK_WIDGET (window));
+	gtk_event_controller_set_propagation_phase (key_controller,
+	                                            GTK_PHASE_BUBBLE);
+	g_signal_connect (key_controller, "key-pressed",
+	                  G_CALLBACK (on_key_pressed), window);
+}
+
+static gboolean
+on_key_pressed (GtkEventControllerKey *controller,
+                guint                  keyval,
+                guint                  keycode,
+                GdkModifierType        state,
+                gpointer               user_data)
+{
+	EvTabbedWindow *window = EV_TABBED_WINDOW (user_data);
+
+	/* Ctrl+Tab: next / previous tab (Shift for prev). */
+	if (keyval == GDK_KEY_Tab && (state & GDK_CONTROL_MASK)) {
+		if (state & GDK_SHIFT_MASK)
+			ev_tabbed_window_select_prev_tab (window);
+		else
+			ev_tabbed_window_select_next_tab (window);
+		return TRUE;
+	}
+
+	/* Ctrl+PgDn / PgUp: alternative. */
+	if ((state & GDK_CONTROL_MASK) &&
+	    (keyval == GDK_KEY_Page_Down || keyval == GDK_KEY_KP_Page_Down)) {
+		ev_tabbed_window_select_next_tab (window);
+		return TRUE;
+	}
+	if ((state & GDK_CONTROL_MASK) &&
+	    (keyval == GDK_KEY_Page_Up || keyval == GDK_KEY_KP_Page_Up)) {
+		ev_tabbed_window_select_prev_tab (window);
+		return TRUE;
+	}
+
+	/* Ctrl+W: close active tab. */
+	if (keyval == GDK_KEY_w && (state & GDK_CONTROL_MASK)) {
+		ev_tabbed_window_close_active_tab (window);
+		return TRUE;
+	}
+
+	/* Ctrl+Shift+T: reopen last closed tab. */
+	if (keyval == GDK_KEY_t &&
+	    (state & GDK_CONTROL_MASK) && (state & GDK_SHIFT_MASK)) {
+		ev_tab_manager_reopen_last_closed_tab (window->priv->tab_manager);
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 static void
@@ -430,4 +490,18 @@ ev_tabbed_window_get_tab_bar_visible (EvTabbedWindow *window)
 {
 	g_return_val_if_fail (EV_IS_TABBED_WINDOW (window), FALSE);
 	return gtk_notebook_get_show_tabs (GTK_NOTEBOOK (window->priv->notebook));
+}
+
+void
+ev_tabbed_window_reopen_last_closed_tab (EvTabbedWindow *window)
+{
+	g_return_if_fail (EV_IS_TABBED_WINDOW (window));
+	ev_tab_manager_reopen_last_closed_tab (window->priv->tab_manager);
+}
+
+guint
+ev_tabbed_window_get_reopen_stack_size (EvTabbedWindow *window)
+{
+	g_return_val_if_fail (EV_IS_TABBED_WINDOW (window), 0);
+	return ev_tab_manager_get_reopen_stack_size (window->priv->tab_manager);
 }

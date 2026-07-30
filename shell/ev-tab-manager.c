@@ -21,10 +21,19 @@
 #include <config.h>
 #include "ev-tab-manager.h"
 
+#define EV_TAB_MANAGER_REOPEN_STACK_MAX 10
+
+typedef struct {
+	EvDocument *document;
+	GFile      *location;
+	gint        page;
+} EvTabClosedEntry;
+
 struct _EvTabManagerPrivate
 {
 	GPtrArray  *tabs;       /* GPtrArray<EvTab>, owned, with ref */
 	gint        active_index; /* -1 = no active tab */
+	GPtrArray  *reopen_stack; /* GPtrArray<EvTabClosedEntry>, bounded */
 };
 
 enum {
@@ -37,6 +46,14 @@ enum {
 
 static guint signals[N_SIGNALS];
 
+static void
+ev_tab_closed_entry_free (EvTabClosedEntry *entry)
+{
+	g_clear_object (&entry->document);
+	g_clear_object (&entry->location);
+	g_free (entry);
+}
+
 G_DEFINE_TYPE_WITH_PRIVATE (EvTabManager, ev_tab_manager, G_TYPE_OBJECT)
 
 static void
@@ -47,6 +64,17 @@ ev_tab_manager_finalize (GObject *object)
 	if (manager->priv->tabs) {
 		g_ptr_array_unref (manager->priv->tabs);
 		manager->priv->tabs = NULL;
+	}
+	if (manager->priv->reopen_stack) {
+		guint i;
+		for (i = 0; i < manager->priv->reopen_stack->len; i++) {
+			EvTabClosedEntry *entry = g_ptr_array_index (manager->priv->reopen_stack, i);
+			g_clear_object (&entry->document);
+			g_clear_object (&entry->location);
+			g_free (entry);
+		}
+		g_ptr_array_unref (manager->priv->reopen_stack);
+		manager->priv->reopen_stack = NULL;
 	}
 
 	G_OBJECT_CLASS (ev_tab_manager_parent_class)->finalize (object);
@@ -59,6 +87,7 @@ ev_tab_manager_init (EvTabManager *manager)
 
 	manager->priv->tabs = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
 	manager->priv->active_index = -1;
+	manager->priv->reopen_stack = g_ptr_array_new ();
 }
 
 static void
@@ -223,6 +252,21 @@ ev_tab_manager_remove_tab (EvTabManager *manager,
 	guint n = manager->priv->tabs->len;
 	gboolean was_active = (manager->priv->active_index == index);
 
+	/* Save to the reopen stack before removing. */
+	if (tab->priv && tab->priv->document) {
+		EvTabClosedEntry *entry = g_new0 (EvTabClosedEntry, 1);
+		entry->document = g_object_ref (tab->priv->document);
+		entry->location = tab->priv->location ? g_object_ref (tab->priv->location) : NULL;
+		entry->page = tab->priv->page;
+		g_ptr_array_add (manager->priv->reopen_stack, entry);
+		/* Bounded growth. */
+		while (manager->priv->reopen_stack->len > EV_TAB_MANAGER_REOPEN_STACK_MAX) {
+			EvTabClosedEntry *old = g_ptr_array_index (manager->priv->reopen_stack, 0);
+			g_ptr_array_remove_index (manager->priv->reopen_stack, 0);
+			ev_tab_closed_entry_free (old);
+		}
+	}
+
 	g_ptr_array_remove_index (manager->priv->tabs, index);
 	g_signal_emit (manager, signals[SIGNAL_TAB_REMOVED], 0, tab);
 
@@ -314,4 +358,48 @@ ev_tab_manager_reorder_tab (EvTabManager *manager,
 
 	g_signal_emit (manager, signals[SIGNAL_TAB_REORDERED], 0,
 	               old_index, new_index);
+}
+
+void
+ev_tab_manager_reopen_last_closed_tab (EvTabManager *manager)
+{
+	g_return_if_fail (EV_IS_TAB_MANAGER (manager));
+
+	if (manager->priv->reopen_stack->len == 0)
+		return;
+
+	EvTabClosedEntry *entry = g_ptr_array_index (
+		manager->priv->reopen_stack,
+		manager->priv->reopen_stack->len - 1);
+	g_ptr_array_remove_index (manager->priv->reopen_stack,
+	                          manager->priv->reopen_stack->len - 1);
+
+	EvTab *tab = EV_TAB (ev_tab_new (entry->document));
+	if (entry->location)
+		ev_tab_set_location (tab, entry->location);
+	if (entry->page >= 0)
+		ev_tab_set_page (tab, entry->page);
+
+	ev_tab_manager_append_tab (manager, tab);
+	g_object_unref (tab);
+
+	ev_tab_closed_entry_free (entry);
+}
+
+guint
+ev_tab_manager_get_reopen_stack_size (EvTabManager *manager)
+{
+	g_return_val_if_fail (EV_IS_TAB_MANAGER (manager), 0);
+	return manager->priv->reopen_stack->len;
+}
+
+void
+ev_tab_manager_clear_reopen_stack (EvTabManager *manager)
+{
+	g_return_if_fail (EV_IS_TAB_MANAGER (manager));
+	while (manager->priv->reopen_stack->len > 0) {
+		EvTabClosedEntry *e = g_ptr_array_index (manager->priv->reopen_stack, 0);
+		g_ptr_array_remove_index (manager->priv->reopen_stack, 0);
+		ev_tab_closed_entry_free (e);
+	}
 }

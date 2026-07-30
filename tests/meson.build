@@ -187,3 +187,27 @@ test(
     test_tab_manager,
     protocol: 'gtest',
 )
+
+test_reopen_stack = executable(
+    'test-reopen-stack',
+    'test-reopen-stack.c',
+    '../shell/ev-tab.c',
+    '../shell/ev-tab-manager.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gobject,
+        gio,
+        gtk,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-reopen-stack"',
+        '-DXREADER_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-reopen-stack',
+    test_reopen_stack,
+    protocol: 'gtest',
+)

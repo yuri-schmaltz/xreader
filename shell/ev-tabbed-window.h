@@ -106,6 +106,15 @@ void          ev_tabbed_window_select_prev_tab   (EvTabbedWindow *window);
  * the window has ≥ 2 tabs). */
 gboolean      ev_tabbed_window_get_tab_bar_visible (EvTabbedWindow *window);
 
+/* Reopen the most recently closed tab.  The reopen stack is
+ * bounded (max 10) so the action is a no-op if the user
+ * hasn't closed any tabs recently. */
+void          ev_tabbed_window_reopen_last_closed_tab (EvTabbedWindow *window);
+
+/* The number of tabs in the reopen stack.  Useful for
+ * enabling / disabling a menu item. */
+guint         ev_tabbed_window_get_reopen_stack_size  (EvTabbedWindow *window);
+
 G_END_DECLS
 
 #endif /* EV_TABBED_WINDOW_H */
