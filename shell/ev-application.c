@@ -1078,11 +1078,40 @@ about_action_activate (GSimpleAction *action,
 			      NULL);
 }
 
+static void
+print_action_activate (GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_print_range (PR #91 will
+	 * wire this up).  For now the action is registered
+	 * but inert. */
+}
+
+static void
+save_action_activate (GSimpleAction *action,
+                      GVariant      *parameter,
+                      gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_save_as (PR #91). */
+}
+
+static void
+find_action_activate (GSimpleAction *action,
+                      GVariant      *parameter,
+                      gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_show_find_bar (PR #91). */
+}
+
 static const GActionEntry app_actions[] = {
 	{ "open-location", open_location_action_activate, "s" },
 	{ "quit",         quit_action_activate,           NULL },
 	{ "help",         help_action_activate,           NULL },
 	{ "about",        about_action_activate,          NULL },
+	{ "print",        print_action_activate,           NULL },
+	{ "save",         save_action_activate,            NULL },
+	{ "find",         find_action_activate,            NULL },
 };
 
 ev_application_class_init (EvApplicationClass *ev_application_class)
