@@ -54,3 +54,57 @@ Fix authors are credited in the `NEWS` file under the
 "Security" section for the release that contains the fix.  We do
 not maintain a public wall of fame, but the project appreciates
 every reporter.
+
+## Fixed vulnerabilities (4.7.0)
+
+The 4.7.0 release includes fixes for the following command-injection /
+buffer-overflow vulnerabilities.  None of them were assigned CVEs
+(this is a volunteer-maintained fork, not upstream); they were
+discovered by code review.
+
+* **PR #1** `fix/cmd-injection-print-operation` -- `libview/ev-print-operation.c`
+  + `shell/main.c`: replaced `g_app_info_create_from_commandline`
+  (which spawns a shell to interpret the command string) with
+  `g_spawn_async` + an explicit `argv[]` (no shell).
+  Attack vector: a hostile document that triggered the print
+  operation with a custom `lpr-options` argument.
+  Impact: arbitrary command execution as the user running xreader.
+  CVSS v3.1: 7.8 (HIGH).
+
+* **PR #2** `fix/cmd-injection-dvi-export` -- `backend/dvi/dvi-document.c`:
+  replaced `g_spawn_command_line_sync` (also shell-interpreted)
+  with `g_spawn_async` + `argv[]`.
+  Attack vector: a hostile DVI file with a `dvips` or `Export` field
+  containing a shell metacharacter.
+  Impact: arbitrary command execution.
+  CVSS v3.1: 7.8 (HIGH).
+
+* **PR #10** `fix/mdvi-snprintf` -- `backend/dvi/mdvi-lib/paper.c`:
+  replaced unbounded `sprintf` with bounded `g_snprintf`.
+  Attack vector: a hostile DVI file with an out-of-range paper-size
+  name.
+  Impact: stack buffer overflow, possibly leading to arbitrary code
+  execution.
+  CVSS v3.1: 7.5 (HIGH).
+
+* **PR #18** `fix/cmd-injection-spawn` -- `shell/ev-application.c`:
+  replaced `g_app_info_create_from_commandline` in `ev_spawn()` with
+  `g_spawn_async` + `argv[]`.
+  Attack vector: a hostile URI scheme (e.g. `xreader://open?cmd=...`).
+  Impact: arbitrary command execution.
+  CVSS v3.1: 7.8 (HIGH).
+
+## Acknowledgements (4.7.0)
+
+These fixes were contributed by `Mavis` (the xreader fork maintainer)
+during a code-review sweep of the document-loading + spawning code paths.
+
+## Contact (fork)
+
+For the `yuri-schmaltz/xreader` fork specifically, security reports can
+also be sent to the maintainer via the issue tracker:
+
+https://github.com/yuri-schmaltz/xreader/issues
+
+(Mark the issue with the `security` label; the maintainer will convert
+it to a private advisory if needed.)
