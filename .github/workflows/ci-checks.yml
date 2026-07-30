@@ -644,3 +644,53 @@ jobs:
           fi
           tar czf cov-int.tgz cov-int
           curl -sSL -F "project=${{ github.repository }}" -F "token=$COVERITY_SCAN_TOKEN" -F "file=@cov-int.tgz" -F "version=${{ github.sha }}" -F "description=CI build" https://scan.coverity.com/builds
+  # Build with clang (instead of gcc) on a separate runner.
+  # Catches the warnings that gcc does not flag and vice
+  # versa.  Not a matrix entry of the warnings job because
+  # the install-deps step is different (we need clang
+  # instead of gcc).
+  clang:
+    name: Clang build
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            clang \
+            build-essential \
+            meson \
+            pkg-config \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libsm-dev \
+            libice-dev \
+            libx11-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            libzip-dev \
+            intltool \
+            xvfb
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: |
+          CC=clang CXX=clang++ meson setup build-clang \
+            --buildtype=debug \
+            -Db_sanitize=address,undefined \
+            -Dcpp_args="-fno-omit-frame-pointer" \
+            -Dc_args="-fno-omit-frame-pointer" \
+            --werror
+      - name: Build
+        run: ninja -C build-clang
