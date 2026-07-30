@@ -44,6 +44,8 @@ static gboolean preview_mode = FALSE;
 static gboolean fullscreen_mode = FALSE;
 static gboolean presentation_mode = FALSE;
 static gboolean unlink_temp_file = FALSE;
+static gboolean tabbed_mode = FALSE;
+static gboolean new_tab_mode = FALSE;
 static gchar   *print_settings;
 static const char **file_arguments = NULL;
 
@@ -70,6 +72,8 @@ static const GOptionEntry goption_options[] =
 	{ "presentation", 's', 0, G_OPTION_ARG_NONE, &presentation_mode, N_("Run xreader in presentation mode"), NULL },
 	{ "preview", 'w', 0, G_OPTION_ARG_NONE, &preview_mode, N_("Run xreader as a previewer"), NULL },
 	{ "find", 'l', 0, G_OPTION_ARG_STRING, &ev_find_string, N_("The word or phrase to find in the document"), N_("STRING")},
+	{ "tabbed", 'T', 0, G_OPTION_ARG_NONE, &tabbed_mode, N_("Open documents in tabs in a single window (C3 tabbed view)"), NULL },
+	{ "new-tab", 0, 0, G_OPTION_ARG_NONE, &new_tab_mode, N_("Open the given file in a new tab in an existing window (requires --tabbed)"), NULL },
 	{ "unlink-tempfile", 'u', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &unlink_temp_file, NULL, NULL },
 	{ "print-settings", 't', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_FILENAME, &print_settings, NULL, NULL },
 	{ "version", 0, G_OPTION_FLAG_NO_ARG | G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_CALLBACK, option_version_cb, NULL, NULL },
@@ -273,6 +277,19 @@ main (int argc, char *argv[])
     }
 
 	ev_application_load_session (application);
+
+	/* If the user passed --tabbed on the command line, persist
+	 * it in GSettings so that subsequent sessions start in
+	 * tabbed mode.  The full integration (creating EvTabbedWindow
+	 * instead of EvWindow when the key is set) is a follow-up PR;
+	 * this PR just makes the flag visible to other parts of the
+	 * code via the GSettings key. */
+	if (tabbed_mode) {
+		GSettings *settings = g_settings_new ("org.x.reader");
+		g_settings_set_boolean (settings, "tabbed-mode", TRUE);
+		g_object_unref (settings);
+	}
+
 	load_files (file_arguments);
 
 	/* Change directory so we don't prevent unmounting in case the initial cwd
