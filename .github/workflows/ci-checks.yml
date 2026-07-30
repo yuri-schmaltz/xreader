@@ -542,3 +542,61 @@ jobs:
           name: iwyu-log
           path: iwyu.log
           if-no-files-found: ignore
+  valgrind:
+    name: Valgrind memory check
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential \
+            meson \
+            pkg-config \
+            libgtk-3-dev \
+            libpoppler-glib-dev \
+            libgxps-dev \
+            libspectre-dev \
+            libkpathsea-dev \
+            libdjvulibre-dev \
+            libtiff-dev \
+            libsecret-1-dev \
+            libxapp-dev \
+            libxml2-dev \
+            libarchive-dev \
+            libgirepository1.0-dev \
+            libwebkit2gtk-4.1-dev \
+            libzip-dev \
+            gettext \
+            intltool \
+            shared-mime-info \
+            valgrind \
+            xvfb \
+            ca-certificates
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: meson setup build-valgrind --buildtype=debug -Db_sanitize=none --werror
+      - name: Build
+        run: meson compile -C build-valgrind
+      - name: Run unit tests under valgrind
+        run: |
+          set +e
+          cd build-valgrind
+          FAILED=0
+          for test in test-file-helpers test-mime test-document-factory test-image test-page-render; do
+            valgrind --quiet --error-exitcode=1 --leak-check=full \
+              --errors-for-leak-kinds=definite,possible \
+              --suppressions=/usr/lib/valgrind/default.supp \
+              ./$test > /tmp/$test.log 2>&1 || FAILED=1
+          done
+          [ $FAILED -eq 0 ]
+      - name: Upload valgrind logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: valgrind-logs
+          path: /tmp/test-*.log
+          if-no-files-found: ignore
