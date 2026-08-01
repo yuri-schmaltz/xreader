@@ -54,15 +54,10 @@ GType ev_document_print_get_type   (void) G_GNUC_CONST;
  * ev_document_print_print_page:
  * @document_print: an #EvDocumentPrint
  * @page: the #EvPage to print
+ * @cr: a #cairo_t context
  *
- * Prints a single page of the document using the configured
- * GtkPrintOperation.
- *
- * Returns: %TRUE on success
+ * Prints a single page of the document.
  */
-gboolean   ev_document_print_print_page            (EvDocumentPrint *document_print,
-						 EvPage          *page);
-
 void  ev_document_print_print_page (EvDocumentPrint *document_print,
 				    EvPage          *page,
 				    cairo_t         *cr);

@@ -18,6 +18,7 @@
 
 #include <config.h>
 #include <string.h>
+#include <glib.h>
 
 #include "common.h"
 #include "mdvi.h"

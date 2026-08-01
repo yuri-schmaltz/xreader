@@ -1,13 +1,7 @@
 #!/usr/bin/make -f
 
-TYPELIBDIR=$(shell pkg-config gobject-introspection-1.0 --variable libdir | sed -e 's/.//')
-
 %:
 	dh $@
-
-override_dh_install:
-	sed 's@TYPELIBDIR@${TYPELIBDIR}@' debian/gir1.2-xreader.install.in > debian/gir1.2-xreader.install
-	dh_install
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -21,13 +15,7 @@ override_dh_auto_configure:
 		-D pixbuf=false \
 		-D comics=true \
 		-D introspection=true \
-		-D help_files=true \
-	# 	--disable-static \
-
-override_dh_strip:
-	dh_strip -pxreader --dbg-package=xreader-dbg
-	dh_strip -plibxreaderdocument3 --dbg-package=libxreaderdocument3-dbg
-	dh_strip -plibxreaderview3 --dbg-package=libxreaderview3-dbg
+		-D help_files=true
 
 override_dh_auto_test:
 

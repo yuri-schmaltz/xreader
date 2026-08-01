@@ -53,7 +53,7 @@ xreader (4.7.0) zena; urgency=medium
       cleanup, afmparse.c g_strdup, g_build_filename in epub
       (PRs #15, #27, #28, #30)
 
-  -- Mavis <Mavis@local>  2026-07-28
+  -- Mavis <Mavis@local>  Tue, 28 Jul 2026 12:00:00 +0000
 
 xreader (4.6.5) zena; urgency=medium
 

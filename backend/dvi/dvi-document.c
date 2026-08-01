@@ -400,7 +400,7 @@ dvi_document_file_exporter_end (EvFileExporter *exporter)
 	};
 
 	success = g_spawn_sync (NULL, argv, NULL, 0, NULL, NULL,
-	                        NULL, &exit_stat, &err);
+	                        NULL, NULL, &exit_stat, &err);
 
 	g_free (pages);
 

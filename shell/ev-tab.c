@@ -151,7 +151,7 @@ ev_tab_init (EvTab *tab)
 	tab->priv->location = NULL;
 
 	tab->priv->box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-	gtk_box_append (GTK_BOX (tab), tab->priv->box);
+	gtk_box_pack_start (GTK_BOX (tab), tab->priv->box, TRUE, TRUE, 0);
 	gtk_widget_show (tab->priv->box);
 }
 

@@ -27,7 +27,7 @@
 
 #include "ev-document-misc.h"
 
-/**
+/*
  * Returns a new GdkPixbuf that is suitable for placing in the thumbnail view.
  * If source_pixbuf is not NULL, then it will fill the return pixbuf with the
  * contents of source_pixbuf.

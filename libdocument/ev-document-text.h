@@ -68,9 +68,6 @@ GType           ev_document_text_get_type         (void) G_GNUC_CONST;
  * Returns: (transfer full): the text of @page, with embedded
  *   CR/LF separators between lines
  */
-char         *ev_document_text_get_text               (EvDocumentText *document_text,
-						   EvPage         *page);
-
 gchar          *ev_document_text_get_text         (EvDocumentText  *document_text,
 						   EvPage          *page);
 gboolean        ev_document_text_get_text_layout  (EvDocumentText  *document_text,

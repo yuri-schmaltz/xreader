@@ -39,6 +39,7 @@ G_BEGIN_DECLS
 
 typedef struct _EvTab EvTab;
 typedef struct _EvTabClass EvTabClass;
+typedef struct _EvTabPrivate EvTabPrivate;
 
 /**
  * EvTab:
@@ -109,6 +110,8 @@ void          ev_tab_set_tooltip       (EvTab      *tab,
 /* Internal: the GtkBox inside the tab that holds the view + scrollbar.
  * Used by EvTabManager to pack the tab into the notebook. */
 GtkWidget    *ev_tab_get_box           (EvTab      *tab);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (EvTab, g_object_unref)
 
 G_END_DECLS
 

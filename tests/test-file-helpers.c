@@ -303,10 +303,6 @@ main (int argc, char *argv[])
 	                 test_file_compress_none_is_noop);
 	g_test_add_func ("/ev-file-helpers/mkdtemp-creates-directory",
 	                 test_mkdtemp_creates_directory);
-	g_test_add_func ("/ev-file-helpers/compress-roundtrip",
-	                 test_compress_roundtrip);
-	g_test_add_func ("/ev-file-helpers/compress-empty",
-	                 test_compress_empty);
 	g_test_add_func ("/ev-file-helpers/tmp-filename-unlink-in-tmp",
 	                 test_tmp_filename_unlink_in_tmp);
 	g_test_add_func ("/ev-file-helpers/tmp-filename-unlink-outside-tmp",

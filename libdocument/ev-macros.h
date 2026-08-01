@@ -29,4 +29,12 @@
 #define EV_UNAVAILABLE(maj,min) G_UNAVAILABLE(maj,min)
 #endif
 
+#ifndef G_GNUC_NONNULL
+#if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3))
+#define G_GNUC_NONNULL(...) __attribute__((__nonnull__(__VA_ARGS__)))
+#else
+#define G_GNUC_NONNULL(...)
+#endif
+#endif
+
 #endif /* #ifndef EV_MACROS_H */

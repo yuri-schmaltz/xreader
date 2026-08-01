@@ -45,19 +45,23 @@ static gboolean on_key_pressed (GtkEventControllerKey *controller,
                                 GdkModifierType        state,
                                 gpointer               user_data);
 
-static void on_page_drop (GtkNotebook       *notebook,
-                          EvTab             *tab,
-                          GdkDragContext     *context,
-                          gint                x,
-                          gint                y,
-                          gpointer            user_data);
+static void on_page_drop (GtkWidget         *widget,
+                          GdkDragContext    *context,
+                          gint               x,
+                          gint               y,
+                          GtkSelectionData  *selection,
+                          guint              info,
+                          guint              time,
+                          gpointer           user_data);
 
 static void on_empty_drop (GtkWidget         *widget,
-                           GdkDragContext     *context,
-                           gint                x,
-                           gint                y,
-                           guint               time,
-                           gpointer            user_data);
+                           GdkDragContext    *context,
+                           gint               x,
+                           gint               y,
+                           GtkSelectionData  *selection,
+                           guint              info,
+                           guint              time,
+                           gpointer           user_data);
 
 static void
 update_tab_bar_visibility (EvTabbedWindow *window)
@@ -232,9 +236,13 @@ on_tab_added (EvTabManager    *manager,
 	GtkWidget *tab_label = gtk_notebook_get_tab_label (
 		GTK_NOTEBOOK (window->priv->notebook), GTK_WIDGET (tab));
 
-	GtkWidget *close_button = gtk_widget_get_last_child (GTK_WIDGET (tab_label));
-	g_signal_connect (close_button, "clicked",
-	                  G_CALLBACK (on_close_button_clicked), window);
+	GList *children = gtk_container_get_children (GTK_CONTAINER (tab_label));
+	GtkWidget *close_button = GTK_WIDGET (g_list_nth_data (children, 1));
+	g_list_free (children);
+	if (close_button) {
+		g_signal_connect (close_button, "clicked",
+		                  G_CALLBACK (on_close_button_clicked), window);
+	}
 
 	/* Update the tab label when the title/tooltip changes. */
 	g_signal_connect (tab, "notify::title", G_CALLBACK (on_tab_changed), tab_label);
@@ -480,7 +488,9 @@ ev_tabbed_window_open_file (EvTabbedWindow *window,
 
 	/* Load the document.  ev_document_factory_get_document()
 	 * returns the loaded document or NULL on error. */
-	EvDocument *document = ev_document_factory_get_document (file, error);
+	gchar *uri = g_file_get_uri (file);
+	EvDocument *document = ev_document_factory_get_document (uri, error);
+	g_free (uri);
 	if (!document)
 		return NULL;
 

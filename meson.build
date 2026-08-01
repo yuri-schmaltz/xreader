@@ -43,6 +43,8 @@ gail = dependency('gail-3.0')
 gio = dependency('gio-2.0', version: '>= 2.36.0')
 glib_version = '2.36.0'
 glib = dependency('glib-2.0', version: '>= ' + glib_version)
+gobject = dependency('gobject-2.0', version: '>= ' + glib_version)
+gdk_pixbuf = dependency('gdk-pixbuf-2.0', version: '>= 2.36.0')
 gmodule = dependency('gmodule-2.0')
 gtk_version = '3.14.0'
 gtk_api_version = '3.0'

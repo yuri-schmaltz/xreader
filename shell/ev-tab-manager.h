@@ -38,6 +38,7 @@ G_BEGIN_DECLS
 
 typedef struct _EvTabManager EvTabManager;
 typedef struct _EvTabManagerClass EvTabManagerClass;
+typedef struct _EvTabManagerPrivate EvTabManagerPrivate;
 
 /**
  * EvTabManager:
@@ -127,3 +128,5 @@ G_END_DECLS
 void          ev_tab_manager_reopen_last_closed_tab (EvTabManager *manager);
 guint         ev_tab_manager_get_reopen_stack_size  (EvTabManager *manager);
 void          ev_tab_manager_clear_reopen_stack     (EvTabManager *manager);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (EvTabManager, g_object_unref)

@@ -81,12 +81,13 @@ test(
 test_image = executable(
     'test-image',
     'test-image.c',
-    '../libdocument/ev-image.c',
     include_directories: include_dirs,
     dependencies: [
         glib,
         gio,
         gdk_pixbuf,
+        gtk,
+        libdocument_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-image"',
@@ -103,12 +104,12 @@ test(
 test_page_render = executable(
     'test-page-render',
     'test-page-render.c',
-    '../libdocument/ev-page.c',
-    '../libdocument/ev-render-context.c',
     include_directories: include_dirs,
     dependencies: [
         glib,
         gio,
+        cairo,
+        libdocument_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-page-render"',
@@ -125,11 +126,12 @@ test(
 test_form_field = executable(
     'test-form-field',
     'test-form-field.c',
-    '../libdocument/ev-form-field.c',
     include_directories: include_dirs,
     dependencies: [
         glib,
         gio,
+        cairo,
+        libdocument_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-form-field"',
@@ -146,11 +148,12 @@ test(
 test_rect_intersect = executable(
     'test-rect-intersect',
     'test-rect-intersect.c',
-    '../libdocument/ev-document.c',
     include_directories: include_dirs,
     dependencies: [
         glib,
         gobject,
+        cairo,
+        libdocument_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-rect-intersect"',
@@ -169,12 +172,14 @@ test_tab_manager = executable(
     'test-tab-manager.c',
     '../shell/ev-tab.c',
     '../shell/ev-tab-manager.c',
-    include_directories: include_dirs,
+    include_directories: [include_dirs, include_directories('../shell')],
     dependencies: [
         glib,
         gobject,
         gio,
         gtk,
+        libdocument_dep,
+        libview_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-tab-manager"',
@@ -193,12 +198,14 @@ test_reopen_stack = executable(
     'test-reopen-stack.c',
     '../shell/ev-tab.c',
     '../shell/ev-tab-manager.c',
-    include_directories: include_dirs,
+    include_directories: [include_dirs, include_directories('../shell')],
     dependencies: [
         glib,
         gobject,
         gio,
         gtk,
+        libdocument_dep,
+        libview_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-reopen-stack"',
@@ -218,12 +225,14 @@ test_tabbed_integration = executable(
     '../shell/ev-tabbed-window.c',
     '../shell/ev-tab.c',
     '../shell/ev-tab-manager.c',
-    include_directories: include_dirs,
+    include_directories: [include_dirs, include_directories('../shell')],
     dependencies: [
         glib,
         gobject,
         gio,
         gtk,
+        libdocument_dep,
+        libview_dep,
     ],
     c_args: [
         '-DG_LOG_DOMAIN="test-tabbed-integration"',

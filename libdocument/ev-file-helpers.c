@@ -196,7 +196,7 @@ ev_mkstemp_file (const char        *template,
         return file;
 }
 
-/**
+/*
  * This function is copied from
  * http://bugzilla.gnome.org/show_bug.cgi?id=524831
  * and renamed from g_mkdtemp to _ev_g_mkdtemp.

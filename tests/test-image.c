@@ -42,6 +42,7 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "ev-image.h"
+#include "ev-file-helpers.h"
 
 /* ----- construction and accessors ----- */
 
@@ -152,7 +153,7 @@ test_save_tmp (void)
 	/* ev_image_get_pixbuf now returns the saved pixbuf. */
 	g_assert_true (ev_image_get_pixbuf (image) == pixbuf);
 
-	g_unlink_uri (uri, NULL, NULL);
+	ev_tmp_uri_unlink (uri);
 
 	g_object_unref (pixbuf);
 	g_object_unref (image);

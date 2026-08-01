@@ -253,11 +253,11 @@ ev_tab_manager_remove_tab (EvTabManager *manager,
 	gboolean was_active = (manager->priv->active_index == index);
 
 	/* Save to the reopen stack before removing. */
-	if (tab->priv && tab->priv->document) {
+	if (ev_tab_get_document (tab)) {
 		EvTabClosedEntry *entry = g_new0 (EvTabClosedEntry, 1);
-		entry->document = g_object_ref (tab->priv->document);
-		entry->location = tab->priv->location ? g_object_ref (tab->priv->location) : NULL;
-		entry->page = tab->priv->page;
+		entry->document = g_object_ref (ev_tab_get_document (tab));
+		entry->location = ev_tab_get_location (tab);
+		entry->page = ev_tab_get_page (tab);
 		g_ptr_array_add (manager->priv->reopen_stack, entry);
 		/* Bounded growth. */
 		while (manager->priv->reopen_stack->len > EV_TAB_MANAGER_REOPEN_STACK_MAX) {

@@ -1103,8 +1103,6 @@ ev_application_dbus_unregister (GApplication    *gapplication,
     }
 
 #endif /* ENABLE_DBUS */
-
-static void
 static void
 open_location_action_activate (GSimpleAction *action,
                                 GVariant      *parameter,
@@ -1133,12 +1131,15 @@ quit_action_activate (GSimpleAction *action,
 
 static void
 help_action_activate (GSimpleAction *action,
-                     GVariant      *parameter,
-                     gpointer       user_data)
+                      GVariant      *parameter,
+                      gpointer       user_data)
 {
-	EvApplication *application = EV_APPLICATION (user_data);
-
-	ev_application_show_help (application, NULL);
+	GError *error = NULL;
+	gtk_show_uri (NULL, "help:xreader", GDK_CURRENT_TIME, &error);
+	if (error) {
+		g_warning ("Error showing help: %s", error->message);
+		g_error_free (error);
+	}
 }
 
 static void
@@ -1197,6 +1198,7 @@ static const GActionEntry app_actions[] = {
 	{ "find",         find_action_activate,            NULL },
 };
 
+static void
 ev_application_class_init (EvApplicationClass *ev_application_class)
 {
         GApplicationClass *g_application_class = G_APPLICATION_CLASS (ev_application_class);

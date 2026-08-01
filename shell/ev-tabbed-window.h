@@ -38,6 +38,7 @@ G_BEGIN_DECLS
 
 typedef struct _EvTabbedWindow EvTabbedWindow;
 typedef struct _EvTabbedWindowClass EvTabbedWindowClass;
+typedef struct _EvTabbedWindowPrivate EvTabbedWindowPrivate;
 
 /**
  * EvTabbedWindow:
@@ -114,6 +115,8 @@ void          ev_tabbed_window_reopen_last_closed_tab (EvTabbedWindow *window);
 /* The number of tabs in the reopen stack.  Useful for
  * enabling / disabling a menu item. */
 guint         ev_tabbed_window_get_reopen_stack_size  (EvTabbedWindow *window);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (EvTabbedWindow, g_object_unref)
 
 G_END_DECLS
 

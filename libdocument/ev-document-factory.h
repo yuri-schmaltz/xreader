@@ -28,6 +28,7 @@
 #include <gtk/gtk.h>
 
 #include "ev-document.h"
+#include "ev-macros.h"
 
 G_BEGIN_DECLS
 

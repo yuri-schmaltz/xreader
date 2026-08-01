@@ -26,6 +26,7 @@
 
 #include <glib.h>
 #include <gio/gio.h>
+#include "ev-macros.h"
 
 G_BEGIN_DECLS
 
