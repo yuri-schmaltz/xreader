@@ -1188,6 +1188,58 @@ find_action_activate (GSimpleAction *action,
 	/* TODO: dispatch to ev_window_show_find_bar (PR #91). */
 }
 
+/* ------------------------------------------------------------------------- */
+/* B1 GAction batch: navigation + zoom + reload (stateless)                */
+/* ------------------------------------------------------------------------- */
+
+static void
+zoom_in_action_activate (GSimpleAction *action,
+			 GVariant      *parameter,
+			 gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_zoom_in() (PR #113 wiring). */
+}
+
+static void
+zoom_out_action_activate (GSimpleAction *action,
+			  GVariant      *parameter,
+			  gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_zoom_out() (PR #113 wiring). */
+}
+
+static void
+zoom_reset_action_activate (GSimpleAction *action,
+			     GVariant      *parameter,
+			     gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_zoom_reset() (PR #113 wiring). */
+}
+
+static void
+next_page_action_activate (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_go_next_page() (PR #113 wiring). */
+}
+
+static void
+prev_page_action_activate (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_go_prev_page() (PR #113 wiring). */
+}
+
+static void
+reload_action_activate (GSimpleAction *action,
+			 GVariant      *parameter,
+			 gpointer       user_data)
+{
+	/* TODO: dispatch to ev_window_reload() (PR #113 wiring). */
+}
+
 static const GActionEntry app_actions[] = {
 	{ "open-location", open_location_action_activate, "s" },
 	{ "quit",         quit_action_activate,           NULL },
@@ -1196,6 +1248,12 @@ static const GActionEntry app_actions[] = {
 	{ "print",        print_action_activate,           NULL },
 	{ "save",         save_action_activate,            NULL },
 	{ "find",         find_action_activate,            NULL },
+	{ "zoom-in",      zoom_in_action_activate,         NULL },
+	{ "zoom-out",     zoom_out_action_activate,        NULL },
+	{ "zoom-reset",   zoom_reset_action_activate,      NULL },
+	{ "next-page",    next_page_action_activate,       NULL },
+	{ "prev-page",    prev_page_action_activate,       NULL },
+	{ "reload",       reload_action_activate,          NULL },
 };
 
 static void
