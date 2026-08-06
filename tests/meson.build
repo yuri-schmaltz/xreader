@@ -301,3 +301,26 @@ test(
     test_smoke_headers,
     protocol: 'gtest',
 )
+
+# test-string-match: unit tests for ev_string_match (PR #117).
+# Covers DEFAULT (case-sensitive substring), CASE_INSENSITIVE,
+# REGEX, and NULL/empty edge cases.  No backend / no GTK
+# dependency, so this test runs in the fast lane.
+test_string_match = executable(
+    'test-string-match',
+    'test-string-match.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-string-match"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-string-match',
+    test_string_match,
+    protocol: 'gtest',
+)
