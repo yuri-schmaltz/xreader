@@ -1240,6 +1240,16 @@ reload_action_activate (GSimpleAction *action,
 	/* TODO: dispatch to ev_window_reload() (PR #113 wiring). */
 }
 
+/* ------------------------------------------------------------------------- */
+/* B1 GAction batch: stateful entries (view-mode, fullscreen, presentation) */
+/*                                                                           */
+/* Stateful GAction entries cannot live in the static app_actions[] table    */
+/* because they need a 'change-state' handler and a state type.  Instead,    */
+/* they are registered via g_action_map_add_action() after the GSettings     */
+/* backing is created (g_settings_create_action returns a GAction that       */
+/* keeps the action's state and the GSettings key in sync).                  */
+/* ------------------------------------------------------------------------- */
+
 static const GActionEntry app_actions[] = {
 	{ "open-location", open_location_action_activate, "s" },
 	{ "quit",         quit_action_activate,           NULL },
@@ -1254,6 +1264,9 @@ static const GActionEntry app_actions[] = {
 	{ "next-page",    next_page_action_activate,       NULL },
 	{ "prev-page",    prev_page_action_activate,       NULL },
 	{ "reload",       reload_action_activate,          NULL },
+	/* 'view-mode' / 'fullscreen' / 'presentation' are stateful
+	 * and are registered separately via g_settings_create_action()
+	 * in ev_application_startup(). */
 };
 
 static void
@@ -1295,6 +1308,48 @@ ev_application_init (EvApplication *ev_application)
 	                                 app_actions,
 	                                 G_N_ELEMENTS (app_actions),
 	                                 ev_application);
+
+	/* Register the stateful GActions (B1 phase 1, PR #114).
+	 *
+	 * Each GSettings key is bound to a GAction whose state
+	 * is the GVariant-typed value of the key.  External
+	 * code can drive these actions via D-Bus
+	 * (`gdbus call --session --dest org.xreader.Application
+	 * --object-path /org/xreader/App
+	 * --method org.gtk.Actions.Activate view-mode
+	 * "<'dual',>"`), and the window code can listen for
+	 * the "notify::state" signal to update the view.
+	 *
+	 * The activation ('activate' signal) is intentionally
+	 * not handled at the application level: the stateful
+	 * GAction's contract is that activation toggles the
+	 * state, which is already what g_settings_create_action
+	 * does (it binds the GSettings key to the action's
+	 * state, and the default change-state handler inverts
+	 * the boolean / cycles the string).
+	 *
+	 * The dispatch (window code that watches "notify::state"
+	 * and updates the view) is the follow-up wiring PR. */
+	{
+		GSettings *settings_main   = g_settings_new ("org.x.reader");
+		GSettings *settings_window = g_settings_new ("org.x.reader.default");
+		GAction   *action;
+
+		action = g_settings_create_action (settings_main, "view-mode");
+		g_action_map_add_action (G_ACTION_MAP (ev_application), action);
+		g_object_unref (action);
+
+		action = g_settings_create_action (settings_window, "fullscreen");
+		g_action_map_add_action (G_ACTION_MAP (ev_application), action);
+		g_object_unref (action);
+
+		action = g_settings_create_action (settings_window, "presentation");
+		g_action_map_add_action (G_ACTION_MAP (ev_application), action);
+		g_object_unref (action);
+
+		g_object_unref (settings_window);
+		g_object_unref (settings_main);
+	}
 
     parse_mimetypes ();
 
