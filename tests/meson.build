@@ -263,3 +263,64 @@ test(
     test_session_roundtrip,
     protocol: 'gtest',
 )
+
+# smoke-headers: compile-test that every public header can be
+# included from a single translation unit with -Wall -Werror.
+# This is the C analogue of the Python `import` smoke test
+# (cf. pires-forge PR #91).  It catches:
+#   - syntax errors in headers
+#   - missing forward declarations
+#   - missing GType / GObject macros
+#   - missing gtk-doc annotations (e.g. non-NULL on a func
+#     that takes a non-NULL pointer)
+# The test only needs to COMPILE; the empty main() returns
+# 0 unconditionally.  If the compile fails, CI fails.
+test_smoke_headers = executable(
+    'smoke-headers',
+    'smoke-headers.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+        gobject,
+        gtk,
+        cairo,
+        libdocument_dep,
+        libview_dep,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="smoke-headers"',
+        '-DXREADER_COMPILATION=1',
+        '-Wall',
+        '-Werror',
+    ],
+)
+
+test(
+    'smoke-headers',
+    test_smoke_headers,
+    protocol: 'gtest',
+)
+
+# test-string-match: unit tests for ev_string_match (PR #117).
+# Covers DEFAULT (case-sensitive substring), CASE_INSENSITIVE,
+# REGEX, and NULL/empty edge cases.  No backend / no GTK
+# dependency, so this test runs in the fast lane.
+test_string_match = executable(
+    'test-string-match',
+    'test-string-match.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-string-match"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-string-match',
+    test_string_match,
+    protocol: 'gtest',
+)
