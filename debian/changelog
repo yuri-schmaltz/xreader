@@ -1,3 +1,39 @@
+xreader (4.9.0) zena; urgency=medium
+
+  * 12 self-PRs landed in the yuri-schmaltz/xreader fork
+    (PRs #108-#119), covering:
+    - [REMOVED] Flatpak manifest and all flatpak references
+      (the fork distributes only via .deb + Snap) (PR #108)
+    - [NEW] B6 PDF form-filling UI foundation:
+      * EvFormFieldType enum + ev_form_field_type_to_string
+        / _from_string helpers (PR #109) -- restores the
+        B6 starter that was lost in the 4.8.0 build fix
+      * 15 value accessors (get/set for text, button,
+        choice) + 'changed' signal on EvFormField (PR #111)
+      * 14 new unit tests (PR #112)
+    - [NEW] B1 GAction migration phase 1 complete:
+      * 6 stateless entries: zoom-in, zoom-out, zoom-reset,
+        next-page, prev-page, reload (PR #113)
+      * 3 stateful entries: view-mode, fullscreen,
+        presentation via g_settings_create_action (PR #114)
+      * 7 -> 16 GAction entries (B1 phase 1 done)
+    - [NEW] B4 search foundation:
+      * ev_string_match() helper with EvStringMatchFlags
+        (DEFAULT / CASE_INSENSITIVE / REGEX) (PR #117)
+      * 19 new unit tests (PR #118)
+    - [NEW] CI smoke-header compile job (13th job) +
+      tests/smoke-headers.c (PR #115) -- the C analogue
+      of the Python import smoke test (catches missing
+      exports, syntax errors, missing G_GNUC_* annotations)
+    - [NEW] tools/check-headers.sh (PR #116) -- verify
+      smoke-headers.c stays in sync with the public
+      header list
+    - 129 unit tests across 13 executables (96 -> 129)
+    - 2 fuzz harnesses with 11 seeds
+    - 13 CI jobs (12 -> 13)
+
+  -- Mavis <Mavis@local>  Thu, 06 Aug 2026
+
 xreader (4.8.0) zena; urgency=medium
 
   * 30 self-PRs landed in the yuri-schmaltz/xreader fork

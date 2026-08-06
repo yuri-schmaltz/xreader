@@ -25,20 +25,30 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
 ## B -- Features
 
   - **B1** GtkAction -> GAction migration -- 4.8.0 to 4.13.0
-    -- Multi-PR -- **IN PROGRESS** (PRs #76, #77, #89
-    started; see `docs/GACTION_MIGRATION.md`).
+    -- Multi-PR -- **PHASE 1 DONE** (PRs #76, #77, #89
+    bootstrap, PRs #113, #114 phase 1 complete = 16 entries
+    registered with EvApplication; see
+    `docs/GACTION_MIGRATION.md`; phase 2 dispatch is 4.10.0).
   - **B2** Pdf form support -- 4.8.0 (infrastructure
     already in `libdocument/ev-form-field.{c,h}`; see
-    PRs #78, #79 for the form-field helpers + tests)
+    PRs #78, #79 for the form-field helpers + tests;
+    PR #109 restored the lost B6 starter; PR #111 added
+    15 value accessors)
     -- Multi-PR -- **IN PROGRESS**.
   - **B3** Tabs (single window, multiple documents) --
     4.14.0 -- Multi-month -- Planned (depends on B1).
   - **B4** Search improvements (regex, case-insensitive,
-    multi-file) -- 4.10.0 -- Bounded -- Planned.
+    multi-file) -- 4.10.0 -- Bounded -- **IN PROGRESS**
+    (PR #117 added the ev_string_match helper with
+    DEFAULT / CASE_INSENSITIVE / REGEX flags; PR #118
+    added 19 unit tests; the 4.10.0 cycle wires it into
+    the backends and EvJobFind).
   - **B5** Annotation export to PDF -- 4.9.0 -- Bounded
     -- Planned.
   - **B6** PDF form-filling UI -- 4.9.0 -- Multi-PR
-    -- Planned.
+    -- **IN PROGRESS** (PRs #109, #111, #112 added the
+    libdocument foundation in 4.9.0; the shell UI is
+    4.10.0+).
 
 ## C -- Long-term / platform
 
@@ -124,10 +134,11 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
 ## Release cadence
 
   - 4.7.0 -- released 2026-07-28 (31 self-PRs)
-  - 4.8.0 -- target Q4 2026 (24+ self-PRs)
-  - 4.9.0 -- target Q1 2027 (PDF form UI, B5)
-  - 4.10.0 -- target Q2 2027 (search improvements, B4)
-  - 4.11.0 - 4.13.0 -- 2027 (GAction + XApp + Wayland)
+  - 4.8.0 -- released 2026-07-30 (76 self-PRs)
+  - 4.9.0 -- target Q4 2026 (12 self-PRs, this cycle)
+  - 4.10.0 -- target Q1 2027 (B1 phase 2 dispatch, B4
+    backend wiring, B6 shell UI)
+  - 4.11.0 - 4.13.0 -- 2027 (GAction finish + XApp + Wayland)
   - 4.14.0 -- Q4 2027 (tabbed view, C3)
   - 4.15.0 -- 2028 (upstream rebase, C1)
   - 4.16.0 -- 2028+ (GTK 4, C2)

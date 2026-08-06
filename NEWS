@@ -18,6 +18,96 @@ vulnerability; see SECURITY.md for the responsible-disclosure
 policy.
 
 
+Changes in 4.9.0 (unreleased)
+-----------------------
+
+This is the next minor release after 4.8.0.  The 4.9.0 cycle
+will include 12 self-PRs in the yuri-schmaltz/xreader fork
+(PRs #108-#119), building on the C3 tabbed-view foundation
+from 4.8.0 and the B1 GAction migration:
+
+Cleanup
+~~~~~~~
+
+* Remove flatpak manifest and all flatpak references
+  (the fork distributes only via .deb + Snap; PR #108).
+  * `io.github.yuri_schmaltz.Xreader.json` deleted.
+  * `tools/lint-branches.sh`: drop 'flatpak' from KNOWN_PREFIXES.
+  * `CONTRIBUTING.md`, `NEWS`, `ROADMAP.md`,
+    `data/xreader.appdata.xml.in`, `debian/changelog` all
+    updated to remove the flatpak lines.
+
+B6 PDF form-filling UI (foundation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `libdocument/ev-form-field.{c,h}` -- add the
+  `EvFormFieldType` enum and the `ev_form_field_type_to_string`
+  / `_from_string` helpers (PR #109).  This restores the B6
+  starter that was lost in the 4.8.0 build fix (commit
+  1612325).  Foundation for the B6 PDF form-filling UI
+  (4.9.0).
+* `libdocument/ev-form-field.{c,h}` -- add 15 public value
+  accessors + a 'changed' signal on EvFormField (PR #111).
+  Covers text/button/choice get/set, all with the 'changed'
+  signal emitted on value change.  Building block for the
+  B6 UI.
+* `tests/test-form-field.c` -- 14 new test cases for the
+  PR #111 accessors (PR #112).  Total: 9 -> 23 form-field
+  tests, 96 -> 110 total.
+
+B1 GAction migration (phase 1 complete)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `shell/ev-application.c` -- add 6 stateless GAction entries
+  (zoom-in, zoom-out, zoom-reset, next-page, prev-page,
+  reload) (PR #113).  All stubs, dispatch is the follow-up
+  wiring PR in 4.10.0.
+* `data/org.x.reader.gschema.xml` + `shell/ev-application.c`
+  -- add 3 stateful GAction entries (view-mode, fullscreen,
+  presentation) via `g_settings_create_action()` (PR #114).
+  B1 phase 1 is now 100% complete: 16 GAction entries
+  registered with EvApplication (up from 7 in 4.8.0).
+
+B4 search improvements (foundation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `libdocument/ev-string-match.{c,h}` -- new helper
+  `ev_string_match(text, pattern, flags)` with a
+  `EvStringMatchFlags` enum (DEFAULT / CASE_INSENSITIVE /
+  REGEX) (PR #117).  Building block for the 4.10.0
+  case-insensitive + regex search.
+* `tests/test-string-match.c` -- 19 new test cases for
+  `ev_string_match` (PR #118).  Total: 110 -> 129 tests.
+
+CI / dev tooling
+~~~~~~~~~~~~~~~~
+
+* `.github/workflows/ci-checks.yml` -- new 13th CI job
+  `smoke-headers` (PR #115).  Compiles a single translation
+  unit that #includes every public xreader header with
+  -Wall -Werror.  Catches missing exports, syntax errors,
+  missing G_GNUC_* annotations, inconsistent export
+  tables.  The C analogue of the Python `import` smoke test
+  that pires-forge added in PR #91.
+* `tests/smoke-headers.c` -- the new translation unit
+  (98 #includes: 38 libdocument + 18 libview + 37 shell).
+* `tools/check-headers.sh` -- new script (PR #116) that
+  verifies tests/smoke-headers.c stays in sync with the
+  public header list in {libdocument,libview,shell}/meson.build.
+  Skips generated headers (meson configure_file output).
+
+Test summary
+~~~~~~~~~~~~
+
+* Total unit tests: 96 -> 129 (+33 across 4 PRs).
+* Total CI jobs: 12 -> 13.
+* Total tools: 5 -> 6 (added check-headers.sh).
+* Total public GAction entries: 7 -> 16 (B1 phase 1 done).
+* Total G_GNUC_* annotations: same as 4.8.0 (no new
+  annotations in this cycle; the work was structural, not
+  annotation).
+
+
 Changes in 4.8.0 (unreleased)
 -----------------------
 

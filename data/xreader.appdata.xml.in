@@ -66,6 +66,21 @@
    <mimetype>image/x-xpixmap</mimetype>
  </mimetypes>
  <releases>
+    <release version="4.9.0" date="2026-08-06">
+      <description>
+        <p>12 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
+        <ul>
+          <li>REMOVED: flatpak manifest and all flatpak references (the fork distributes only via .deb + Snap) (PR #108)</li>
+          <li>NEW: B6 PDF form-filling UI foundation -- EvFormFieldType enum + helpers (PR #109) + 15 value accessors + 'changed' signal (PR #111) + 14 unit tests (PR #112)</li>
+          <li>NEW: B1 GAction phase 1 complete -- 6 stateless + 3 stateful entries (PRs #113, #114). 16 GAction entries total (up from 7 in 4.8.0)</li>
+          <li>NEW: B4 search foundation -- ev_string_match() helper with CASE_INSENSITIVE + REGEX flags (PR #117) + 19 unit tests (PR #118)</li>
+          <li>NEW: CI smoke-header compile job (13th job) -- the C analogue of the Python import smoke test (PR #115)</li>
+          <li>NEW: tools/check-headers.sh -- verify smoke-headers.c stays in sync with public header list (PR #116)</li>
+          <li>RESTORED: B6 starter helpers (ev_form_field_type_to_string/_from_string) that were lost in the 4.8.0 build fix (PR #109)</li>
+          <li>129 unit tests across 13 executables + 2 fuzz harnesses + 13 CI jobs (96 -> 129 tests, 12 -> 13 jobs)</li>
+        </ul>
+      </description>
+    </release>
     <release version="4.8.0" date="2026-07-30">
       <description>
         <p>30 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
