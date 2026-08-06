@@ -81,6 +81,7 @@
 #include "libdocument/ev-page.h"
 #include "libdocument/ev-render-context.h"
 #include "libdocument/ev-selection.h"
+#include "libdocument/ev-string-match.h"
 #include "libdocument/ev-transition-effect.h"
 
 /* --- libview (the rendering layer) --- */

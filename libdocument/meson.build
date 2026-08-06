@@ -39,6 +39,7 @@ libdocument_headers = [
     'ev-page.h',
     'ev-render-context.h',
     'ev-selection.h',
+    'ev-string-match.h',
     'ev-transition-effect.h',
 ]
 
@@ -77,6 +78,7 @@ libdocument_sources = [
     'ev-page.c',
     'ev-render-context.c',
     'ev-selection.c',
+    'ev-string-match.c',
     'ev-transition-effect.c',
     'ev-document-misc.c',
     libdocument_headers,
