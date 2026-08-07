@@ -66,6 +66,18 @@
    <mimetype>image/x-xpixmap</mimetype>
  </mimetypes>
  <releases>
+    <release version="4.11.0" date="2026-08-07">
+      <description>
+        <p>6 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
+        <ul>
+          <li>NEW: E3 gtk-doc campaign -- 183 gtk-doc blocks across 13 public headers (ev-link family, ev-document family, ev-jobs, ev-attachment, ev-image, ev-page-cache, ev-mapping-list, ev-backends-manager, ev-layer, ev-module).  Public surface area: 0 lines net (doc-only).  Documentation coverage: 12/30 -> 25/30 headers (40% -> 83%).</li>
+          <li>NEW: B1 GAction phase 2 finish -- ev_window_save_as() + ev_window_show_find_bar() public functions, rewire 'save' and 'find' GAction dispatch (PRs #126-#130, PRs #127-#131 are E3 docs and release prep).</li>
+          <li>100 public GType decls verified in sync with 105 G_DEFINE_TYPE entries (tools/check-public-api.sh, no linker failures)</li>
+          <li>137 unit tests across 14 executables (no change from 4.10.0; doc-only cycle)</li>
+          <li>7 dev tools (no change from 4.10.0)</li>
+        </ul>
+      </description>
+    </release>
     <release version="4.10.0" date="2026-08-07">
       <description>
         <p>6 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
