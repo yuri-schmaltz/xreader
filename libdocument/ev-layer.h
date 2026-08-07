@@ -39,6 +39,17 @@ typedef struct _EvLayerPrivate EvLayerPrivate;
 #define EV_IS_LAYER_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE((klass), EV_TYPE_LAYER))
 #define EV_LAYER_GET_CLASS(object) (G_TYPE_INSTANCE_GET_CLASS((object), EV_TYPE_LAYER, EvLayerClass))
 
+/**
+ * EvLayer:
+ *
+ * The #EvLayer object represents a single layer in a PDF
+ * document's optional content (the "Layers" feature of
+ * PDF 1.5+).  Layers can be shown, hidden, or toggled by
+ * the user; the layer's visibility is controlled by the
+ * #EvLinkAction of type LAYERS_STATE.
+ *
+ * Since: 4.8.0
+ */
 struct _EvLayer {
 	GObject base_instance;
 	
@@ -50,9 +61,41 @@ struct _EvLayerClass {
 };
 
 GType     ev_layer_get_type     (void) G_GNUC_CONST;
+
+/**
+ * ev_layer_new:
+ * @is_parent: %TRUE if the layer is a parent layer (a
+ *   grouping layer that can contain other layers)
+ * @rb_group: the radio-button group id (or 0 if the
+ *   layer is not part of a radio group)
+ *
+ * Creates a new #EvLayer.
+ *
+ * Returns: (transfer full): a new #EvLayer
+ *
+ * Since: 4.8.0
+ */
 EvLayer  *ev_layer_new          (gboolean is_parent,
 				 gint     rb_group);
+
+/**
+ * ev_layer_is_parent:
+ * @layer: an #EvLayer
+ *
+ * Returns: %TRUE if @layer is a parent (grouping) layer
+ *
+ * Since: 4.8.0
+ */
 gboolean  ev_layer_is_parent    (EvLayer *layer);
+
+/**
+ * ev_layer_get_rb_group:
+ * @layer: an #EvLayer
+ *
+ * Returns: the radio-button group id (0 = no group)
+ *
+ * Since: 4.8.0
+ */
 gint      ev_layer_get_rb_group (EvLayer *layer);
 
 G_END_DECLS
