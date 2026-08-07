@@ -66,6 +66,19 @@
    <mimetype>image/x-xpixmap</mimetype>
  </mimetypes>
  <releases>
+    <release version="4.10.0" date="2026-08-07">
+      <description>
+        <p>6 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>
+        <ul>
+          <li>NEW: B1 GAction phase 2 dispatch (partial) -- ev_application_get_active_window() helper + 'print' GAction wired to ev_window_print_range() (PR #120)</li>
+          <li>NEW: B5 PDF annotation export list helpers -- ev_annotations_filter_by_type() + ev_annotations_count_by_type() (PR #121) + 10 unit tests (PR #122)</li>
+          <li>NEW: tools/check-public-api.sh -- verify every public GType decl has a matching G_DEFINE_TYPE in the .c file. Catches linker failures. Found a real bug (PR #123)</li>
+          <li>REMOVED: dead EvJobWebThumbnail type (2 typedefs + 4 macros in libview/ev-jobs.h) -- orphan from an old WebKit 4.1 revision (PR #124)</li>
+          <li>139 unit tests across 14 executables + 7 dev tools (129 -> 139 tests, 6 -> 7 tools)</li>
+          <li>Public surface area: -6 lines (dead type removal)</li>
+        </ul>
+      </description>
+    </release>
     <release version="4.9.0" date="2026-08-06">
       <description>
         <p>12 self-PRs landed in the yuri-schmaltz/xreader fork, covering:</p>

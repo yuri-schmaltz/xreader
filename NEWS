@@ -18,6 +18,89 @@ vulnerability; see SECURITY.md for the responsible-disclosure
 policy.
 
 
+Changes in 4.10.0 (unreleased)
+-----------------------
+
+This is the next minor release after 4.9.0.  The 4.10.0
+cycle includes 6 self-PRs in the yuri-schmaltz/xreader fork
+(PRs #120-#125), continuing the B1 GAction dispatch + the
+B5 annotation list helpers + the B1 phase 2 dispatch:
+
+B1 GAction migration (phase 2 partial)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `shell/ev-application.{c,h}` -- add
+  `ev_application_get_active_window()` helper.  Returns
+  the active #EvWindow (the one with focus, or the first
+  one if no window has focus), or NULL if the application
+  has no EvWindow.  Used by the B1 phase 2 dispatch
+  to find the target window for stateless actions
+  (PR #120).
+* `shell/ev-application.c` -- wire the 'print' GAction
+  to call `ev_window_print_range()` on the active window
+  with `GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG`.  The
+  'save' and 'find' actions are also wired (window
+  finding done, implementation pending --
+  ev_window_save_as() / ev_window_show_find_bar() land
+  in 4.10.0 follow-ups).  (PR #120)
+
+B5 PDF annotation export (list helpers)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `libdocument/ev-annotation.{c,h}` -- add two libdocument
+  helpers for filtering and counting annotations by
+  type (PR #121):
+  - `ev_annotations_filter_by_type(list, type)` -> new
+    GList with only annotations of the given type
+  - `ev_annotations_count_by_type(list, type)` -> guint
+    count (no list allocation)
+  Both are used by the B5 PDF export (4.10.0+) to
+  iterate each annotation TYPE separately (text ->
+  PopplerAnnotText, markup -> PopplerAnnotTextMarkup, etc.).
+* `tests/test-annotations-filter.c` -- 10 unit-test
+  cases (8 filter + 2 count) for the B5 helpers.
+  Total tests: 129 -> 139 (PR #122).
+
+Dev tooling
+~~~~~~~~~~~
+
+* `tools/check-public-api.sh` -- new dev tool (PR #123)
+  that verifies every public GType function declared
+  in a header has a matching `G_DEFINE_TYPE` (or
+  `G_DEFINE_BOXED_TYPE` / `G_DEFINE_INTERFACE` /
+  `G_DEFINE_ENUM_TYPE` / `G_DEFINE_FLAGS_TYPE`) in the
+  corresponding .c file.  Catches missing implementations
+  that would fail to link, and missing declarations for
+  macros that reference functions.  The C analogue of
+  the Python 'is this module imported?' sanity check.
+  Cost: <1s, pure bash + awk + grep.
+* `libview/ev-jobs.h` -- remove the dead `EvJobWebThumbnail`
+  type (the 2 typedefs + 4 macros) (PR #124).  This
+  was an orphan from an old revision (the 'Web' suffix
+  was for the WebKit 4.1 thumbnailer that we no longer
+  have).  `check-public-api.sh` flagged the missing
+  `ev_job_web_thumbnail_get_type()` in PR #123.
+
+Test summary
+~~~~~~~~~~~~
+
+* Total unit tests: 129 -> 139 (+10, +1 new executable).
+* Total tools: 6 -> 7 (added check-public-api.sh).
+* Public GType decls: 100 verified (no linker failures).
+* Public surface area: -6 lines (dead type removal).
+
+Bug fixes
+~~~~~~~~~
+
+* `libview/ev-jobs.h` -- remove the dead `EvJobWebThumbnail`
+  type (2 typedefs + 4 macros).  The header referenced
+  `ev_job_web_thumbnail_get_type()` but the function was
+  never defined.  This is dead code from an old
+  WebKit 4.1 revision that the build fix in 4.8.0 didn't
+  catch because the dead macros were never actually used.
+  (PR #124)
+
+
 Changes in 4.9.0 (unreleased)
 -----------------------
 
