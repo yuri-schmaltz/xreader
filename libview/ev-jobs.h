@@ -45,9 +45,6 @@ typedef struct _EvJobPageDataClass EvJobPageDataClass;
 typedef struct _EvJobThumbnail EvJobThumbnail;
 typedef struct _EvJobThumbnailClass EvJobThumbnailClass;
 
-typedef struct _EvJobWebThumbnail EvJobWebThumbnail;
-typedef struct _EvJobWebThumbnailClass EvJobWebThumbnailClass;
-
 typedef struct _EvJobLinks EvJobLinks;
 typedef struct _EvJobLinksClass EvJobLinksClass;
 
@@ -113,11 +110,6 @@ typedef struct _EvJobPrintClass EvJobPrintClass;
 #define EV_JOB_THUMBNAIL(object)	     (G_TYPE_CHECK_INSTANCE_CAST((object), EV_TYPE_JOB_THUMBNAIL, EvJobThumbnail))
 #define EV_JOB_THUMBNAIL_CLASS(klass)	     (G_TYPE_CHECK_CLASS_CAST((klass), EV_TYPE_JOB_THUMBNAIL, EvJobThumbnailClass))
 #define EV_IS_JOB_THUMBNAIL(object)	     (G_TYPE_CHECK_INSTANCE_TYPE((object), EV_TYPE_JOB_THUMBNAIL))
-
-#define EV_TYPE_JOB_WEB_THUMBNAIL		     (ev_job_web_thumbnail_get_type())
-#define EV_JOB_WEB_THUMBNAIL(object)	     (G_TYPE_CHECK_INSTANCE_CAST((object), EV_TYPE_JOB_WEB_THUMBNAIL, EvJobWebThumbnail))
-#define EV_JOB_WEB_THUMBNAIL_CLASS(klass)	     (G_TYPE_CHECK_CLASS_CAST((klass), EV_TYPE_JOB_WEB_THUMBNAIL, EvJobWebThumbnailClass))
-#define EV_IS_JOB_WEB_THUMBNAIL(object)	     (G_TYPE_CHECK_INSTANCE_TYPE((object), EV_TYPE_JOB_WEB_THUMBNAIL))
 
 #define EV_TYPE_JOB_FONTS		     (ev_job_fonts_get_type())
 #define EV_JOB_FONTS(object)	     	     (G_TYPE_CHECK_INSTANCE_CAST((object), EV_TYPE_JOB_FONTS, EvJobFonts))
