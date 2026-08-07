@@ -1167,9 +1167,19 @@ print_action_activate (GSimpleAction *action,
                        GVariant      *parameter,
                        gpointer       user_data)
 {
-	/* TODO: dispatch to ev_window_print_range (PR #91 will
-	 * wire this up).  For now the action is registered
-	 * but inert. */
+	EvApplication *application = EV_APPLICATION (user_data);
+	EvWindow      *window;
+
+	/* B1 phase 2 dispatch (PR #120, 4.10.0 cycle):
+	 * find the active window and call ev_window_print_range(). */
+	window = ev_application_get_active_window (application);
+	if (window == NULL) {
+		g_warning ("print: no active window");
+		return;
+	}
+
+	ev_window_print_range (window, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,
+	                       NULL, NULL, NULL, NULL);
 }
 
 static void
@@ -1177,7 +1187,22 @@ save_action_activate (GSimpleAction *action,
                       GVariant      *parameter,
                       gpointer       user_data)
 {
-	/* TODO: dispatch to ev_window_save_as (PR #91). */
+	EvApplication *application = EV_APPLICATION (user_data);
+	EvWindow      *window;
+
+	/* B1 phase 2 dispatch (PR #120): find the active window.
+	 * The actual save-as workflow (file chooser + backend
+	 * write) needs ev_window_save_as() which is a 4.10.0+
+	 * helper -- not in 4.9.0's ev_window.h.  PR #120 wires
+	 * the dispatch; the missing ev_window_save_as() lands
+	 * in 4.10.0 (PR #123, scope: backend integration). */
+	window = ev_application_get_active_window (application);
+	if (window == NULL) {
+		g_warning ("save: no active window");
+		return;
+	}
+
+	g_warning ("save: ev_window_save_as() not implemented yet (4.10.0 follow-up)");
 }
 
 static void
@@ -1185,7 +1210,21 @@ find_action_activate (GSimpleAction *action,
                       GVariant      *parameter,
                       gpointer       user_data)
 {
-	/* TODO: dispatch to ev_window_show_find_bar (PR #91). */
+	EvApplication *application = EV_APPLICATION (user_data);
+	EvWindow      *window;
+
+	/* B1 phase 2 dispatch (PR #120): find the active window.
+	 * The find-bar toggle needs ev_window_show_find_bar()
+	 * (4.10.0+).  The existing eggfindbar.c widget is the
+	 * implementation; the dispatch wrapper is the missing
+	 * piece. */
+	window = ev_application_get_active_window (application);
+	if (window == NULL) {
+		g_warning ("find: no active window");
+		return;
+	}
+
+	g_warning ("find: ev_window_show_find_bar() not implemented yet (4.10.0 follow-up)");
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1397,6 +1436,56 @@ ev_application_get_n_windows (EvApplication *application)
     }
 
     return retval;
+}
+
+/**
+ * ev_application_get_active_window:
+ * @application: an #EvApplication
+ *
+ * Returns the active top-level #EvWindow (the one with
+ * keyboard focus, or the first one if no window has focus).
+ *
+ * Used by the B1 GAction dispatch layer (PR #120, 4.10.0
+ * cycle) to find the target window for stateless actions
+ * like 'print', 'zoom-in', etc.  Returns %NULL if the
+ * application has no EvWindow (e.g. only the "recent
+ * files" dialog is open, or no document is loaded).
+ *
+ * Returns: (transfer none) (nullable): the active #EvWindow
+ *
+ * Since: 4.10.0
+ */
+EvWindow *
+ev_application_get_active_window (EvApplication *application)
+{
+    GtkWindow *gtk_active;
+    GList     *l, *windows;
+
+    g_return_val_if_fail (EV_IS_APPLICATION (application), NULL);
+
+    /* 1. Try the GTK-tracked active window first (the one
+     *    with focus).  If it's an EvWindow, use it. */
+    gtk_active = gtk_application_get_active_window (GTK_APPLICATION (application));
+    if (gtk_active != NULL && EV_IS_WINDOW (gtk_active)) {
+        return EV_WINDOW (gtk_active);
+    }
+
+    /* 2. Fallback: walk the application window list and
+     *    return the first EvWindow.  This handles the case
+     *    where the active window is an EvTabbedWindow (C3
+     *    tabbed view) or a non-EvWindow dialog.  We don't
+     *    descend into the EvTabbedWindow's tabs here --
+     *    the B1 dispatch treats the EvTabbedWindow as the
+     *    dispatch target, and the tabbed window's own
+     *    handler fans out to the active tab. */
+    windows = gtk_application_get_windows (GTK_APPLICATION (application));
+    for (l = windows; l != NULL; l = l->next) {
+        if (EV_IS_WINDOW (l->data)) {
+            return EV_WINDOW (l->data);
+        }
+    }
+
+    return NULL;
 }
 
 const gchar *

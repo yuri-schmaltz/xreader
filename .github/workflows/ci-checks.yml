@@ -737,3 +737,19 @@ jobs:
               -Wall -Werror \
               -c tests/smoke-headers.c -o /tmp/smoke-headers.o
           echo "OK: smoke-headers.c compiled"
+
+  # Verify that tests/smoke-headers.c stays in sync with
+  # the public header list in {libdocument,libview,shell}/meson.build.
+  # PR #116 added tools/check-headers.sh; this PR wires it
+  # into CI as the 14th job.
+  # Cost: <1s (pure bash + grep).  No meson, no compilation.
+  check-headers:
+    name: Check smoke-headers.c is in sync
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run tools/check-headers.sh
+        run: ./tools/check-headers.sh
