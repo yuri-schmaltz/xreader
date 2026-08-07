@@ -3045,21 +3045,48 @@ ev_window_save_job_cb (EvJob     *job,
     }
 }
 
-static void
+void
 ev_window_save_as (EvWindow *ev_window,
-		   gchar* uri)
+		   const gchar *uri)
 {
     /* FIXME: remote copy should be done here rather than in the save job,
      * so that we can track progress and cancel the operation
      */
+    g_return_if_fail (EV_IS_WINDOW (ev_window));
+    g_return_if_fail (uri != NULL);
+
     ev_window_clear_save_job (ev_window);
     ev_window->priv->save_job = ev_job_save_new (ev_window->priv->document,
-            uri, ev_window->priv->uri);
+            (gchar *) uri, ev_window->priv->uri);
     g_signal_connect (ev_window->priv->save_job, "finished",
             G_CALLBACK (ev_window_save_job_cb),
             ev_window);
     /* The priority doesn't matter for this job */
     ev_job_scheduler_push_job (ev_window->priv->save_job, EV_JOB_PRIORITY_NONE);
+}
+
+void
+ev_window_show_find_bar (EvWindow *ev_window)
+{
+    /* B1 phase 2 finish (PR #130, 4.11.0 cycle): the
+     * public counterpart of ev_window_cmd_edit_find().
+     * The GtkAction-based version is still in place for
+     * the menubar / toolbar; the GAction dispatch in
+     * ev-application.c uses this function directly. */
+    g_return_if_fail (EV_IS_WINDOW (ev_window));
+
+    if (ev_window->priv->document == NULL ||
+        !EV_IS_DOCUMENT_FIND (ev_window->priv->document)) {
+        g_warning ("ev_window_show_find_bar: document does not support find");
+        return;
+    }
+
+    if (EV_WINDOW_IS_PRESENTATION (ev_window))
+        return;
+
+    update_chrome_flag (ev_window, EV_CHROME_FINDBAR, TRUE);
+    update_chrome_visibility (ev_window);
+    gtk_widget_grab_focus (ev_window->priv->find_bar);
 }
 
 static void

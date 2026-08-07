@@ -41,12 +41,69 @@ typedef struct _EvLinkPrivate EvLinkPrivate;
 #define EV_IS_LINK_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE((klass), EV_TYPE_LINK))
 #define EV_LINK_GET_CLASS(object) (G_TYPE_INSTANCE_GET_CLASS((object), EV_TYPE_LINK, EvLinkClass))
 
+/**
+ * EvLink:
+ *
+ * The #EvLink object represents a single hyperlink extracted from
+ * a document (PDF, DjVu, ...).  Each link has a human-readable
+ * title (e.g. "Chapter 1") and an #EvLinkAction that describes
+ * where the link points to (a URL, a named destination, a launch
+ * command, etc.).
+ *
+ * The #EvLink is part of the "links" interface family; the
+ * document-specific backends (poppler, djvu) populate the
+ * fields on creation and the shell sidebar reads them back to
+ * build the bookmarks / table-of-contents UI.
+ *
+ * Since: 4.8.0
+ */
 GType         ev_link_get_type	 (void) G_GNUC_CONST;
 
+/**
+ * ev_link_new:
+ * @title: (nullable): the human-readable title of the link, or %NULL
+ * @action: (transfer none): the #EvLinkAction that describes the
+ *   destination
+ *
+ * Creates a new #EvLink with the given @title and @action.
+ * The @action reference is owned by the caller (it is NOT
+ * reffed by the link -- the link holds a borrowed reference).
+ *
+ * Returns: (transfer full): a newly-allocated #EvLink, free
+ *   with g_object_unref()
+ *
+ * Since: 4.8.0
+ */
 EvLink	     *ev_link_new	 (const gchar  *title,
 				  EvLinkAction *action);
 
+/**
+ * ev_link_get_title:
+ * @self: an #EvLink
+ *
+ * Returns the human-readable title of the link (e.g. "Chapter 1"
+ * or "Section 3.2").  The string is owned by the link and
+ * must not be freed.
+ *
+ * Returns: (transfer none) (nullable): the title, or %NULL
+ *
+ * Since: 4.8.0
+ */
 const gchar  *ev_link_get_title  (EvLink       *self);
+
+/**
+ * ev_link_get_action:
+ * @self: an #EvLink
+ *
+ * Returns the #EvLinkAction describing where the link points
+ * to.  The action is owned by the link and must not be
+ * unreffed.
+ *
+ * Returns: (transfer none) (nullable): the action, or %NULL
+ *   if the link is not actionable
+ *
+ * Since: 4.8.0
+ */
 EvLinkAction *ev_link_get_action (EvLink       *self);
 
 G_END_DECLS
