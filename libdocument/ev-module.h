@@ -56,17 +56,65 @@ G_BEGIN_DECLS
 #define EV_IS_MODULE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((obj), EV_TYPE_MODULE))
 #define EV_MODULE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), EV_TYPE_MODULE, EvModuleClass))
 
+/**
+ * EvModule:
+ *
+ * The #EvModule is a thin wrapper around GModule that
+ * loads a backend .so file and provides a single GType
+ * inside it.  The backends-manager creates one #EvModule
+ * per loaded backend .so file.
+ *
+ * Since: 4.8.0
+ */
 typedef struct _EvModule EvModule;
 
 GType        ev_module_get_type        (void) G_GNUC_CONST;
 
+/**
+ * ev_module_new:
+ * @path: the path to the .so file
+ * @resident: %TRUE to keep the .so loaded after the module
+ *   is finalized (useful for hot-reloadable backends)
+ *
+ * Creates a new #EvModule that wraps @path.
+ *
+ * Returns: (transfer full): a new #EvModule
+ *
+ * Since: 4.8.0
+ */
 EvModule    *ev_module_new             (const gchar *path,
 					gboolean     resident);
 
+/**
+ * ev_module_get_path:
+ * @module: an #EvModule
+ *
+ * Returns: (transfer none): the path to the .so file
+ *
+ * Since: 4.8.0
+ */
 const gchar *ev_module_get_path        (EvModule    *module);
 
+/**
+ * ev_module_new_object:
+ * @module: an #EvModule
+ *
+ * Creates a new instance of the GType exported by the .so.
+ *
+ * Returns: (transfer full) (nullable): a new GObject, or %NULL
+ *
+ * Since: 4.8.0
+ */
 GObject     *ev_module_new_object      (EvModule    *module);
 
+/**
+ * ev_module_get_object_type:
+ * @module: an #EvModule
+ *
+ * Returns: the GType exported by the .so
+ *
+ * Since: 4.8.0
+ */
 GType        ev_module_get_object_type (EvModule    *module);
 
 G_END_DECLS
