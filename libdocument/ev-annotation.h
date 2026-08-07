@@ -97,6 +97,62 @@ typedef enum {
 	EV_ANNOTATION_TYPE_TEXT_MARKUP
 } EvAnnotationType;
 
+/* ------------------------------------------------------------------------- */
+/* B5: List helpers (used by the B5 PDF export + the shell annotation        */
+/*      toolbar / "save annotations" UI).                                     */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * ev_annotations_filter_by_type:
+ * @annotations: (element-type EvAnnotation) (transfer none) (nullable):
+ *   a GList of #EvAnnotation, or %NULL
+ * @type: the #EvAnnotationType to filter by
+ *
+ * Returns a newly-allocated GList containing only the
+ * annotations whose ev_annotation_get_annotation_type()
+ * matches @type.  The input list is not modified.  The
+ * caller owns the returned list and must free it with
+ * g_list_free() (the elements are NOT unreffed -- they
+ * belong to the document).
+ *
+ * If @annotations is %NULL or empty, returns %NULL.
+ * If no annotation matches @type, returns %NULL.
+ *
+ * Used by:
+ *   - B5 PDF export (PR #123, 4.10.0): the export code
+ *     iterates each type separately to apply the right
+ *     PDF annotation conversion (text -> PopplerAnnotText,
+ *     markup -> PopplerAnnotTextMarkup, etc.)
+ *   - shell annotation sidebar (4.10.0+): "show only
+ *     notes / only highlights" filter dropdown.
+ *
+ * Returns: (transfer full) (element-type EvAnnotation) (nullable):
+ *   a new GList, or %NULL
+ *
+ * Since: 4.10.0
+ */
+GList *ev_annotations_filter_by_type  (GList           *annotations,
+				       EvAnnotationType type);
+
+/**
+ * ev_annotations_count_by_type:
+ * @annotations: (element-type EvAnnotation) (transfer none) (nullable):
+ *   a GList of #EvAnnotation, or %NULL
+ * @type: the #EvAnnotationType to count
+ *
+ * Returns the number of annotations in @annotations whose
+ * ev_annotation_get_annotation_type() matches @type.
+ *
+ * Cheaper than ev_annotations_filter_by_type() when the
+ * caller only needs the count (no list allocation).
+ *
+ * Returns: the count (0 if @annotations is %NULL)
+ *
+ * Since: 4.10.0
+ */
+guint ev_annotations_count_by_type    (GList           *annotations,
+				       EvAnnotationType type);
+
 typedef enum {
     EV_ANNOTATION_TEXT_ICON_NOTE,
     EV_ANNOTATION_TEXT_ICON_COMMENT,
