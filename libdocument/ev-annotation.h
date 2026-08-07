@@ -97,6 +97,62 @@ typedef enum {
 	EV_ANNOTATION_TYPE_TEXT_MARKUP
 } EvAnnotationType;
 
+/* ------------------------------------------------------------------------- */
+/* B5: List helpers (used by the B5 PDF export + the shell annotation        */
+/*      toolbar / "save annotations" UI).                                     */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * ev_annotations_filter_by_type:
+ * @annotations: (element-type EvAnnotation) (transfer none) (nullable):
+ *   a GList of #EvAnnotation, or %NULL
+ * @type: the #EvAnnotationType to filter by
+ *
+ * Returns a newly-allocated GList containing only the
+ * annotations whose ev_annotation_get_annotation_type()
+ * matches @type.  The input list is not modified.  The
+ * caller owns the returned list and must free it with
+ * g_list_free() (the elements are NOT unreffed -- they
+ * belong to the document).
+ *
+ * If @annotations is %NULL or empty, returns %NULL.
+ * If no annotation matches @type, returns %NULL.
+ *
+ * Used by:
+ *   - B5 PDF export (PR #123, 4.10.0): the export code
+ *     iterates each type separately to apply the right
+ *     PDF annotation conversion (text -> PopplerAnnotText,
+ *     markup -> PopplerAnnotTextMarkup, etc.)
+ *   - shell annotation sidebar (4.10.0+): "show only
+ *     notes / only highlights" filter dropdown.
+ *
+ * Returns: (transfer full) (element-type EvAnnotation) (nullable):
+ *   a new GList, or %NULL
+ *
+ * Since: 4.10.0
+ */
+GList *ev_annotations_filter_by_type  (GList           *annotations,
+				       EvAnnotationType type);
+
+/**
+ * ev_annotations_count_by_type:
+ * @annotations: (element-type EvAnnotation) (transfer none) (nullable):
+ *   a GList of #EvAnnotation, or %NULL
+ * @type: the #EvAnnotationType to count
+ *
+ * Returns the number of annotations in @annotations whose
+ * ev_annotation_get_annotation_type() matches @type.
+ *
+ * Cheaper than ev_annotations_filter_by_type() when the
+ * caller only needs the count (no list allocation).
+ *
+ * Returns: the count (0 if @annotations is %NULL)
+ *
+ * Since: 4.10.0
+ */
+guint ev_annotations_count_by_type    (GList           *annotations,
+				       EvAnnotationType type);
+
 typedef enum {
     EV_ANNOTATION_TEXT_ICON_NOTE,
     EV_ANNOTATION_TEXT_ICON_COMMENT,
@@ -118,21 +174,180 @@ typedef enum {
 } EvAnnotationTextMarkupType;
 
 /* EvAnnotation */
+/**
+ * ev_annotation_get_type:
+ *
+ * Returns the GType for the EvAnnotation abstract base class.
+ *
+ * Returns: the GType
+ *
+ * Since: 1.0
+ */
 GType                ev_annotation_get_type                  (void) G_GNUC_CONST;
+
+/**
+ * ev_annotation_get_annotation_type:
+ * @annot: an #EvAnnotation
+ *
+ * Returns the concrete type of the annotation (text / markup
+ * / attachment / text-markup).
+ *
+ * Returns: the #EvAnnotationType
+ *
+ * Since: 1.0
+ */
 EvAnnotationType     ev_annotation_get_annotation_type       (EvAnnotation           *annot);
+
+/**
+ * ev_annotation_get_page:
+ * @annot: an #EvAnnotation
+ *
+ * Returns the #EvPage the annotation is attached to.
+ * The returned reference is owned by @annot; do not unref.
+ *
+ * Returns: (transfer none) (nullable): the #EvPage, or %NULL
+ *
+ * Since: 1.0
+ */
 EvPage              *ev_annotation_get_page                  (EvAnnotation           *annot);
+
+/**
+ * ev_annotation_get_page_index:
+ * @annot: an #EvAnnotation
+ *
+ * Returns the index of the page the annotation is attached to
+ * (0-based).  Equivalent to ev_page_get_index() on the
+ * ev_annotation_get_page() result, but does not require
+ * a NULL check.
+ *
+ * Returns: the page index, or G_MAXUINT if @annot has no page
+ *
+ * Since: 1.0
+ */
 guint                ev_annotation_get_page_index            (EvAnnotation           *annot);
+
+/**
+ * ev_annotation_equal:
+ * @annot: an #EvAnnotation
+ * @other: another #EvAnnotation
+ *
+ * Returns whether the two annotations are equal (same
+ * underlying poppler / djvu / etc. object, not just same
+ * field values).  Used by the annotations sidebar to
+ * dedup loaded annotations.
+ *
+ * Returns: %TRUE if equal
+ *
+ * Since: 1.0
+ */
 gboolean             ev_annotation_equal                     (EvAnnotation           *annot,
                                                               EvAnnotation           *other);
+
+/**
+ * ev_annotation_get_contents:
+ * @annot: an #EvAnnotation
+ *
+ * Returns the text contents of the annotation (the body
+ * of a note, the text of a text-markup highlight, etc.).
+ * The returned string is owned by @annot; do not free.
+ *
+ * Returns: (transfer none) (nullable): the contents, or %NULL
+ *
+ * Since: 1.0
+ */
 const gchar         *ev_annotation_get_contents              (EvAnnotation           *annot);
+
+/**
+ * ev_annotation_set_contents:
+ * @annot: an #EvAnnotation
+ * @contents: (nullable): the new contents
+ *
+ * Sets the text contents.  Marks the document as modified
+ * (the next save will write the new contents back to the
+ * PDF).
+ *
+ * Returns: %TRUE on success
+ *
+ * Since: 1.0
+ */
 gboolean             ev_annotation_set_contents              (EvAnnotation           *annot,
                                                               const gchar            *contents);
+
+/**
+ * ev_annotation_get_name:
+ * @annot: an #EvAnnotation
+ *
+ * Returns the unique name of the annotation (used internally
+ * by the backends to identify the annotation in the document).
+ * The returned string is owned by @annot; do not free.
+ *
+ * Returns: (transfer none) (nullable): the name, or %NULL
+ *
+ * Since: 1.0
+ */
 const gchar         *ev_annotation_get_name                  (EvAnnotation           *annot);
+
+/**
+ * ev_annotation_set_name:
+ * @annot: an #EvAnnotation
+ * @name: (nullable): the new name
+ *
+ * Sets the unique name.  Names must be unique within a
+ * document; setting a duplicate name returns %FALSE.
+ *
+ * Returns: %TRUE on success
+ *
+ * Since: 1.0
+ */
 gboolean             ev_annotation_set_name                  (EvAnnotation           *annot,
                                                               const gchar            *name);
+
+/**
+ * ev_annotation_get_modified:
+ * @annot: an #EvAnnotation
+ *
+ * Returns the last-modified date of the annotation, as
+ * an ISO 8601 string (the format used by the PDF / DjVu
+ * metadata).  The returned string is owned by @annot;
+ * do not free.
+ *
+ * For a time_t-typed version, use g_date_time_new_from_iso8601()
+ * on the returned string.
+ *
+ * Returns: (transfer none) (nullable): the modified date, or %NULL
+ *
+ * Since: 1.0
+ */
 const gchar         *ev_annotation_get_modified              (EvAnnotation           *annot);
+
+/**
+ * ev_annotation_set_modified:
+ * @annot: an #EvAnnotation
+ * @modified: (nullable): the new modified date (ISO 8601)
+ *
+ * Sets the last-modified date.  Use
+ * ev_annotation_set_modified_from_time() to set it from
+ * a time_t.
+ *
+ * Returns: %TRUE on success
+ *
+ * Since: 1.0
+ */
 gboolean             ev_annotation_set_modified              (EvAnnotation           *annot,
                                                               const gchar            *modified);
+
+/**
+ * ev_annotation_set_modified_from_time:
+ * @annot: an #EvAnnotation
+ * @utime: the new modified time (seconds since epoch)
+ *
+ * Sets the last-modified date from a time_t.  The conversion
+ * to the ISO 8601 string is done with localtime_r().
+ *
+ * Returns: %TRUE on success
+ *
+ * Since: 1.0
+ */
 gboolean             ev_annotation_set_modified_from_time    (EvAnnotation           *annot,
                                                               time_t                  utime);
 EV_DEPRECATED_FOR(ev_annotaion_get_rgba)
