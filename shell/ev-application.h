@@ -69,6 +69,7 @@ void              ev_application_open_uri_list          (EvApplication   *applic
                                                          guint32          timestamp);
 gboolean          ev_application_has_window             (EvApplication   *application);
 guint             ev_application_get_n_windows          (EvApplication   *application);
+EvWindow *        ev_application_get_active_window      (EvApplication   *application);
 const gchar *     ev_application_get_uri                (EvApplication   *application);
 void              ev_application_screensaver_enable     (EvApplication   *application);
 void              ev_application_screensaver_disable    (EvApplication   *application);

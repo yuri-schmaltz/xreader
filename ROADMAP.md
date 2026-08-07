@@ -28,7 +28,12 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
     -- Multi-PR -- **PHASE 1 DONE** (PRs #76, #77, #89
     bootstrap, PRs #113, #114 phase 1 complete = 16 entries
     registered with EvApplication; see
-    `docs/GACTION_MIGRATION.md`; phase 2 dispatch is 4.10.0).
+    `docs/GACTION_MIGRATION.md`; **PHASE 2 PARTIAL** in
+    4.10.0: PR #120 added ev_application_get_active_window()
+    + wired the 'print' GAction to ev_window_print_range().
+    'save' and 'find' are also wired (window-finding done)
+    but need new ev_window_save_as() and
+    ev_window_show_find_bar() helpers (4.10.0+ follow-ups).
   - **B2** Pdf form support -- 4.8.0 (infrastructure
     already in `libdocument/ev-form-field.{c,h}`; see
     PRs #78, #79 for the form-field helpers + tests;
@@ -44,7 +49,10 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
     added 19 unit tests; the 4.10.0 cycle wires it into
     the backends and EvJobFind).
   - **B5** Annotation export to PDF -- 4.9.0 -- Bounded
-    -- Planned.
+    -- **IN PROGRESS** (PRs #121, #122 in 4.10.0 added the
+    libdocument list helpers: ev_annotations_filter_by_type()
+    and ev_annotations_count_by_type(), plus 10 unit tests.
+    The Poppler backend wiring is 4.10.0+).
   - **B6** PDF form-filling UI -- 4.9.0 -- Multi-PR
     -- **IN PROGRESS** (PRs #109, #111, #112 added the
     libdocument foundation in 4.9.0; the shell UI is
@@ -107,6 +115,15 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
     **DONE** (PR #75).
   - **D16** `_FORTIFY_SOURCE=3` + `-fstack-protector-strong`
     -- 4.8.0 -- Bounded -- **DONE** (PR #81).
+  - **D17** `tools/check-headers.sh` + CI job (13th + 14th)
+    -- 4.9.0 -- Bounded -- **DONE** (PRs #115, #116, #121).
+  - **D18** `tools/check-public-api.sh` -- 4.10.0 -- Bounded
+    -- **DONE** (PR #123).  Verifies that every public GType
+    function declared in a header has a matching
+    `G_DEFINE_TYPE` / `G_DEFINE_BOXED_TYPE` /
+    `G_DEFINE_INTERFACE` / etc. in the corresponding .c file.
+    Catches linker failures and missing macro implementations.
+    The C analogue of the Python import-smoke test.
 
 ## E -- Documentation
 
@@ -116,8 +133,10 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
   - **E2** debian/changelog -- Ongoing -- Bounded --
     **IN PROGRESS** (one entry per release).
   - **E3** gtk-doc blocks on public headers -- 4.7.0 to
-    4.8.0 -- Bounded -- **IN PROGRESS** (9 of ~30
-    headers done in PRs #52, #56-#60).
+    4.8.0 -- Bounded -- **IN PROGRESS** (12 of ~30
+    headers done in PRs #52, #56-#60, #120).  4.9.0 added
+    EvAnnotation.  4.10.0+ will tackle EvFormField,
+    EvFormFieldText, EvFormFieldButton, EvDocument, etc.
   - **E4** CONTRIBUTING.md -- 4.8.0 -- Bounded --
     **DONE** (PR #91).
   - **E5** CODE_OF_CONDUCT.md -- 4.8.0 -- Bounded --

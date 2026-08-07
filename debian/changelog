@@ -1,3 +1,38 @@
+xreader (4.10.0) zena; urgency=medium
+
+  * 6 self-PRs landed in the yuri-schmaltz/xreader fork
+    (PRs #120-#125), covering:
+    - [NEW] B1 GAction phase 2 dispatch (partial):
+      * ev_application_get_active_window() helper
+        (PR #120)
+      * 'print' GAction wired to ev_window_print_range()
+        (PR #120)
+      * 'save' and 'find' actions also wired
+        (window-finding done, implementation pending --
+        ev_window_save_as() / ev_window_show_find_bar()
+        land in 4.10.0 follow-ups)
+    - [NEW] B5 PDF annotation export list helpers:
+      * ev_annotations_filter_by_type() (PR #121)
+      * ev_annotations_count_by_type() (PR #121)
+      * 10 unit tests (PR #122)
+    - [NEW] tools/check-public-api.sh -- verify every
+      public GType decl has a matching G_DEFINE_TYPE
+      in the .c file.  Catches linker failures.  The
+      C analogue of the Python import smoke test.
+      (PR #123)
+    - [REMOVED] dead EvJobWebThumbnail type (2 typedefs
+      + 4 macros in libview/ev-jobs.h) -- orphan from an
+      old WebKit 4.1 revision that the 4.8.0 build fix
+      didn't catch.  (PR #124)
+    - 139 unit tests across 14 executables + 7 dev tools
+      (129 -> 139 tests, 6 -> 7 tools)
+    - Public surface area: -6 lines (dead type removal)
+    - 16 GAction entries (B1 phase 2 partial -- print
+      wired, 4 more need ev_window_* helpers deferred
+      to 4.10.0+)
+
+ -- Yuri Schmaltz <yuri@local>  Fri, 07 Aug 2026 04:30:00 +0000
+
 xreader (4.9.0) zena; urgency=medium
 
   * 12 self-PRs landed in the yuri-schmaltz/xreader fork

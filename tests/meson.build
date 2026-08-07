@@ -324,3 +324,32 @@ test(
     test_string_match,
     protocol: 'gtest',
 )
+
+# test-annotations-filter: unit tests for ev_annotations_filter_by_type
+# and ev_annotations_count_by_type (PR #121, B5 libdocument foundation).
+# 10 cases: 8 for the filter + 2 for the count.
+# Pure libdocument (no GTK, no backend).  Uses real EvAnnotation
+# objects created via the public constructors.
+test_annotations_filter = executable(
+    'test-annotations-filter',
+    'test-annotations-filter.c',
+    include_directories: include_dirs,
+    dependencies: [
+        glib,
+        gio,
+        gobject,
+        gtk,
+        cairo,
+        libdocument_dep,
+    ],
+    c_args: [
+        '-DG_LOG_DOMAIN="test-annotations-filter"',
+        '-DEV_COMPILATION=1',
+    ],
+)
+
+test(
+    'test-annotations-filter',
+    test_annotations_filter,
+    protocol: 'gtest',
+)
