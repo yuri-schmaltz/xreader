@@ -1190,19 +1190,29 @@ save_action_activate (GSimpleAction *action,
 	EvApplication *application = EV_APPLICATION (user_data);
 	EvWindow      *window;
 
-	/* B1 phase 2 dispatch (PR #120): find the active window.
-	 * The actual save-as workflow (file chooser + backend
-	 * write) needs ev_window_save_as() which is a 4.10.0+
-	 * helper -- not in 4.9.0's ev_window.h.  PR #120 wires
-	 * the dispatch; the missing ev_window_save_as() lands
-	 * in 4.10.0 (PR #123, scope: backend integration). */
+	/* B1 phase 2 finish (PR #130, 4.11.0 cycle): the
+	 * 'save' GAction now calls ev_window_save_as() --
+	 * the public counterpart (lifted from static in
+	 * PR #130) of the file-chooser + backend write
+	 * workflow.  PR #120 wired the dispatch; this PR
+	 * supplies the missing implementation. */
 	window = ev_application_get_active_window (application);
 	if (window == NULL) {
 		g_warning ("save: no active window");
 		return;
 	}
 
-	g_warning ("save: ev_window_save_as() not implemented yet (4.10.0 follow-up)");
+	if (ev_window_is_empty (window)) {
+		g_warning ("save: window has no document");
+		return;
+	}
+
+	/* 'save' is "save a copy" (the menubar / toolbar
+	 * semantics): show a file chooser, then call
+	 * ev_window_save_as() with the chosen URI.  The
+	 * existing ev_window_cmd_save_as() does exactly
+	 * this and we reuse it via the public name. */
+	ev_window_cmd_save_as (NULL, window);
 }
 
 static void
@@ -1213,18 +1223,19 @@ find_action_activate (GSimpleAction *action,
 	EvApplication *application = EV_APPLICATION (user_data);
 	EvWindow      *window;
 
-	/* B1 phase 2 dispatch (PR #120): find the active window.
-	 * The find-bar toggle needs ev_window_show_find_bar()
-	 * (4.10.0+).  The existing eggfindbar.c widget is the
-	 * implementation; the dispatch wrapper is the missing
-	 * piece. */
+	/* B1 phase 2 finish (PR #130, 4.11.0 cycle): the
+	 * 'find' GAction now calls ev_window_show_find_bar()
+	 * -- a new public function in ev-window.h (PR #130)
+	 * that wraps the eggfindbar toggle logic.  PR #120
+	 * wired the dispatch; this PR supplies the missing
+	 * implementation. */
 	window = ev_application_get_active_window (application);
 	if (window == NULL) {
 		g_warning ("find: no active window");
 		return;
 	}
 
-	g_warning ("find: ev_window_show_find_bar() not implemented yet (4.10.0 follow-up)");
+	ev_window_show_find_bar (window);
 }
 
 /* ------------------------------------------------------------------------- */

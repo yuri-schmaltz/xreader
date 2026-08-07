@@ -137,8 +137,20 @@ GType           ev_document_info_get_type (void) G_GNUC_CONST;
  * @info: (transfer none): an #EvDocumentInfo
  *
  * Returns: (transfer full): a deep copy of @info
+ *
+ * Since: 4.8.0
  */
 EvDocumentInfo *ev_document_info_copy     (EvDocumentInfo *info);
+
+/**
+ * ev_document_info_free:
+ * @info: (nullable): an #EvDocumentInfo
+ *
+ * Frees @info and all of its string fields.  If @info is
+ * %NULL, this is a no-op.
+ *
+ * Since: 4.8.0
+ */
 void            ev_document_info_free     (EvDocumentInfo *info);
 
 /* EvDocumentLicense */
@@ -154,12 +166,73 @@ GType              ev_document_license_get_type          (void) G_GNUC_CONST;
  * ev_document_license_new:
  *
  * Returns: (transfer full): a new empty #EvDocumentLicense
+ *
+ * Since: 4.8.0
  */
 EvDocumentLicense *ev_document_license_new               (void);
+
+/**
+ * ev_document_license_copy:
+ * @license: an #EvDocumentLicense
+ *
+ * Returns: (transfer full): a deep copy of @license
+ *
+ * Since: 4.8.0
+ */
 EvDocumentLicense *ev_document_license_copy              (EvDocumentLicense *license);
+
+/**
+ * ev_document_license_free:
+ * @license: (nullable): an #EvDocumentLicense
+ *
+ * Frees @license and all of its string fields.  If @license
+ * is %NULL, this is a no-op.
+ *
+ * Since: 4.8.0
+ */
 void               ev_document_license_free              (EvDocumentLicense *license);
+
+/**
+ * ev_document_license_get_text:
+ * @license: an #EvDocumentLicense
+ *
+ * Returns the human-readable license text (e.g. "This
+ * document is licensed under CC-BY-SA 4.0").  The string
+ * is owned by @license and must not be freed.
+ *
+ * Returns: (transfer none) (nullable): the license text, or %NULL
+ *
+ * Since: 4.8.0
+ */
 const gchar       *ev_document_license_get_text          (EvDocumentLicense *license);
+
+/**
+ * ev_document_license_get_uri:
+ * @license: an #EvDocumentLicense
+ *
+ * Returns the URI of the license (e.g.
+ * "https://creativecommons.org/licenses/by-sa/4.0/").
+ * The string is owned by @license and must not be freed.
+ *
+ * Returns: (transfer none) (nullable): the license URI, or %NULL
+ *
+ * Since: 4.8.0
+ */
 const gchar       *ev_document_license_get_uri           (EvDocumentLicense *license);
+
+/**
+ * ev_document_license_get_web_statement:
+ * @license: an #EvDocumentLicense
+ *
+ * Returns the web-statement URL (a human-readable page
+ * about the license, e.g.
+ * "https://example.com/this-doc-license.html").  The
+ * string is owned by @license and must not be freed.
+ *
+ * Returns: (transfer none) (nullable): the web-statement URL, or %NULL
+ *
+ * Since: 4.8.0
+ */
 const gchar       *ev_document_license_get_web_statement (EvDocumentLicense *license);
 
 G_END_DECLS

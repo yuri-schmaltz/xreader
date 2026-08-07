@@ -1,3 +1,40 @@
+xreader (4.11.0) zena; urgency=medium
+
+  * 6 self-PRs landed in the yuri-schmaltz/xreader fork
+    (PRs #126-#131), covering:
+    - [NEW] E3 gtk-doc campaign:
+      * ev-link, ev-link-action, ev-link-dest (40 gtk-doc
+        blocks, PR #126)
+      * ev-document, ev-document-info (47 gtk-doc blocks,
+        PR #127)
+      * ev-jobs (36 gtk-doc blocks for all 14 EvJob
+        subclasses + the base EvJob class, PR #128)
+      * ev-attachment, ev-image, ev-page-cache,
+        ev-mapping-list, ev-backends-manager, ev-layer,
+        ev-module (60 gtk-doc blocks, PR #129)
+      Total: 183 gtk-doc blocks across 13 public headers.
+      Public gtk-doc coverage: 12/30 -> 25/30 headers
+      (40% -> 83%); ~137/300 -> ~196/300 funcs (~46% ->
+      ~65%).
+    - [NEW] B1 GAction phase 2 finish (PR #130):
+      * ev_window_save_as() -- public counterpart of
+        the file-chooser + backend write workflow
+        (was static in 4.10.0)
+      * ev_window_show_find_bar() -- new public function
+        wrapping the eggfindbar toggle logic
+      * The 'save' and 'find' GAction handlers
+        (PR #120 left them as g_warning stubs) now
+        call the new public functions.
+    - Public surface area: +2 public functions,
+      -0 lines net
+    - 100 public GType decls verified in sync with
+      105 G_DEFINE_TYPE entries
+    - 137 unit tests (no change; doc-only cycle)
+    - 7 dev tools (no change)
+    - 16 GAction entries (B1 phase 2 fully wired)
+
+ -- Yuri Schmaltz <yuri@local>  Fri, 07 Aug 2026 18:35:00 +0000
+
 xreader (4.10.0) zena; urgency=medium
 
   * 6 self-PRs landed in the yuri-schmaltz/xreader fork

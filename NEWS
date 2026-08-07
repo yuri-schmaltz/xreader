@@ -18,6 +18,89 @@ vulnerability; see SECURITY.md for the responsible-disclosure
 policy.
 
 
+Changes in 4.11.0 (unreleased)
+-----------------------
+
+This is the next minor release after 4.10.0.  The 4.11.0
+cycle includes 6 self-PRs in the yuri-schmaltz/xreader fork
+(PRs #126-#131), focused on the E3 gtk-doc campaign and
+finishing the B1 GAction phase 2 dispatch:
+
+E3 gtk-doc campaign (4.11.0 cycle)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* 6 PRs of pure documentation work -- 4 of gtk-doc and 1
+  of release prep.  Documentation coverage jumps from
+  ~12 of ~30 public headers (40%) to ~25 of ~30
+  (83%) and 137 of ~300 public functions (~46%) to
+  ~196 of ~300 (~65%).
+
+  - PR #126: ev-link, ev-link-action, ev-link-dest
+    (40 gtk-doc blocks, 24 functions documented)
+  - PR #127: ev-document, ev-document-info
+    (47 gtk-doc blocks, ~38 functions documented)
+  - PR #128: ev-jobs (36 gtk-doc blocks, all 14 EvJob
+    subclasses + the base EvJob class documented)
+  - PR #129: ev-attachment, ev-image, ev-page-cache,
+    ev-mapping-list, ev-backends-manager, ev-layer,
+    ev-module (60 gtk-doc blocks, ~50 functions
+    documented)
+
+* Total E3 cycle: 183 gtk-doc blocks across 13 headers.
+  The remaining undocumented headers (5 of ~30 = 17%)
+  are: ev-debug, ev-init, ev-macros, ev-document-factory,
+  ev-render-context (all small / leaf headers -- will
+  land in 4.12.0+).
+
+B1 GAction phase 2 finish
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `shell/ev-window.{c,h}` -- add 2 new public functions
+  (PR #130):
+  - `ev_window_save_as(window, uri)`: public counterpart
+    of the file-chooser + backend write workflow.  Was
+    a static helper in 4.10.0; lifted to public so the
+    'save' GAction can call it.
+  - `ev_window_show_find_bar(window)`: new public function
+    that wraps the eggfindbar toggle logic.  The
+    GtkAction-based `ev_window_cmd_edit_find` is
+    unchanged; the GAction path now uses this new
+    function directly.
+* `shell/ev-application.c` -- the 'save' and 'find'
+  GAction handlers (which PR #120 left as g_warning
+  stubs) now call the public `ev_window_cmd_save_as`
+  and `ev_window_show_find_bar` respectively.  The
+  B1 phase 2 GAction dispatch is now complete: 16
+  GAction entries, all wired to real implementations.
+
+Dev tooling (no new tools in 4.11.0)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* 7 dev tools (no change from 4.10.0):
+  tools/lint-commits.sh + tools/lint-branches.sh +
+  tools/release.sh + tools/mailmap-cleanup.sh +
+  tools/check-source.sh + tools/check-headers.sh +
+  tools/check-public-api.sh
+
+Test summary
+~~~~~~~~~~~~
+
+* Total unit tests: 137 (no change from 4.10.0;
+  documentation-only cycle)
+* Total tools: 7 (no change)
+* Public GType decls: 100 (verified in sync with
+  105 G_DEFINE_TYPE entries)
+* Public surface area: 0 lines net (added 2 public
+  functions, removed 0)
+* Public gtk-doc coverage: 137/300 -> 196/300 funcs
+  (+59), 12/30 -> 25/30 headers (+13)
+
+Bug fixes
+~~~~~~~~~
+
+* None (documentation-only cycle).
+
+
 Changes in 4.10.0 (unreleased)
 -----------------------
 

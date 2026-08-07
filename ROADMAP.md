@@ -25,15 +25,11 @@ C = Long-term, D = Build/CI/Dev tools, E = Documentation).
 ## B -- Features
 
   - **B1** GtkAction -> GAction migration -- 4.8.0 to 4.13.0
-    -- Multi-PR -- **PHASE 1 DONE** (PRs #76, #77, #89
-    bootstrap, PRs #113, #114 phase 1 complete = 16 entries
-    registered with EvApplication; see
-    `docs/GACTION_MIGRATION.md`; **PHASE 2 PARTIAL** in
-    4.10.0: PR #120 added ev_application_get_active_window()
-    + wired the 'print' GAction to ev_window_print_range().
-    'save' and 'find' are also wired (window-finding done)
-    but need new ev_window_save_as() and
-    ev_window_show_find_bar() helpers (4.10.0+ follow-ups).
+    -- Multi-PR -- **PHASE 1 DONE + PHASE 2 DONE** (PRs #76,
+    #77, #89 bootstrap, PRs #113, #114 phase 1 = 16 entries
+    registered with EvApplication; PRs #120, #130 phase 2 =
+    all entries wired to real implementations; see
+    `docs/GACTION_MIGRATION.md`).
   - **B2** Pdf form support -- 4.8.0 (infrastructure
     already in `libdocument/ev-form-field.{c,h}`; see
     PRs #78, #79 for the form-field helpers + tests;

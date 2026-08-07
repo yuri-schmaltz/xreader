@@ -112,6 +112,17 @@ void                ev_window_show_help                 (EvWindow       *ev_wind
 GtkActionGroup *    ev_window_get_main_action_group     (EvWindow       *window);
 EvDocumentModel *   ev_window_get_document_model        (EvWindow       *ev_window);
 
+/* B1 phase 2 finish (PR #130, 4.11.0 cycle): the public
+ * counterparts of the B1 phase 2 'save' and 'find' GAction
+ * dispatch (PR #120).  These were previously static helpers
+ * or non-existent (only the GtkAction-based cmd_save_as /
+ * cmd_edit_find were public via the GtkActionGroup).  Now
+ * they're public methods on #EvWindow, callable from the
+ * GAction dispatch in ev-application.c. */
+void                ev_window_save_as                   (EvWindow       *ev_window,
+                                                         const gchar    *uri);
+void                ev_window_show_find_bar             (EvWindow       *ev_window);
+
 
 G_END_DECLS
 
