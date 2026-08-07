@@ -1506,3 +1506,58 @@ ev_annotation_text_markup_set_markup_type (EvAnnotationTextMarkup    *annot,
 
         return TRUE;
 }
+
+/* ------------------------------------------------------------------------- */
+/* B5: List helpers                                                           */
+/* ------------------------------------------------------------------------- */
+
+GList *
+ev_annotations_filter_by_type (GList           *annotations,
+			       EvAnnotationType type)
+{
+	GList *result = NULL;
+	GList *l;
+
+	g_return_val_if_fail (type > EV_ANNOTATION_TYPE_UNKNOWN &&
+			      type <= EV_ANNOTATION_TYPE_TEXT_MARKUP,
+			      NULL);
+
+	for (l = annotations; l != NULL; l = l->next) {
+		EvAnnotation *annot = l->data;
+
+		if (annot == NULL || !EV_IS_ANNOTATION (annot))
+			continue;
+
+		if (ev_annotation_get_annotation_type (annot) == type) {
+			result = g_list_prepend (result, annot);
+		}
+	}
+
+	/* Preserve the input order (the caller may want
+	 * "annotations as they appear on the page"). */
+	return g_list_reverse (result);
+}
+
+guint
+ev_annotations_count_by_type (GList           *annotations,
+			     EvAnnotationType type)
+{
+	guint count = 0;
+	GList *l;
+
+	g_return_val_if_fail (type > EV_ANNOTATION_TYPE_UNKNOWN &&
+			      type <= EV_ANNOTATION_TYPE_TEXT_MARKUP,
+			      0);
+
+	for (l = annotations; l != NULL; l = l->next) {
+		EvAnnotation *annot = l->data;
+
+		if (annot == NULL || !EV_IS_ANNOTATION (annot))
+			continue;
+
+		if (ev_annotation_get_annotation_type (annot) == type)
+			count++;
+	}
+
+	return count;
+}
